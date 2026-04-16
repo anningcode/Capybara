@@ -1,0 +1,43 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.14.37203.1 d17.14
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Capybara", "Capybara\Capybara.csproj", "{96231FFC-B6F6-4E5B-8FDA-48D6BC4EC674}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Capybara.Models", "Capybara.Models\Capybara.Models.csproj", "{31BF9A1E-AB08-4722-AC9B-A39CA975D929}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Capybara.Agent", "Capybara.Agent\Capybara.Agent.csproj", "{92532702-FC2F-4E85-A0F6-12F9997E0217}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Capybara.Tool.Plugin", "Capybara.Tool.Plugin\Capybara.Tool.Plugin.csproj", "{B44AD881-A1B6-497C-B8C5-697676321AD1}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{96231FFC-B6F6-4E5B-8FDA-48D6BC4EC674}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{96231FFC-B6F6-4E5B-8FDA-48D6BC4EC674}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{96231FFC-B6F6-4E5B-8FDA-48D6BC4EC674}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{96231FFC-B6F6-4E5B-8FDA-48D6BC4EC674}.Release|Any CPU.Build.0 = Release|Any CPU
+		{31BF9A1E-AB08-4722-AC9B-A39CA975D929}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{31BF9A1E-AB08-4722-AC9B-A39CA975D929}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{31BF9A1E-AB08-4722-AC9B-A39CA975D929}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{31BF9A1E-AB08-4722-AC9B-A39CA975D929}.Release|Any CPU.Build.0 = Release|Any CPU
+		{92532702-FC2F-4E85-A0F6-12F9997E0217}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{92532702-FC2F-4E85-A0F6-12F9997E0217}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{92532702-FC2F-4E85-A0F6-12F9997E0217}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{92532702-FC2F-4E85-A0F6-12F9997E0217}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B44AD881-A1B6-497C-B8C5-697676321AD1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B44AD881-A1B6-497C-B8C5-697676321AD1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B44AD881-A1B6-497C-B8C5-697676321AD1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B44AD881-A1B6-497C-B8C5-697676321AD1}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E89096EB-D337-45C8-91D8-4E22694A9C30}
+	EndGlobalSection
+EndGlobal

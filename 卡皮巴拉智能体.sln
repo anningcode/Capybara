@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.37203.1 d17.14
+VisualStudioVersion = 17.14.37203.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Capybara", "Capybara\Capybara.csproj", "{96231FFC-B6F6-4E5B-8FDA-48D6BC4EC674}"
 EndProject
@@ -9,7 +9,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Capybara.Models", "Capybara
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Capybara.Agent", "Capybara.Agent\Capybara.Agent.csproj", "{92532702-FC2F-4E85-A0F6-12F9997E0217}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Capybara.Tool.Plugin", "Capybara.Tool.Plugin\Capybara.Tool.Plugin.csproj", "{B44AD881-A1B6-497C-B8C5-697676321AD1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Capybara.Tool", "Capybara.Tool\Capybara.Tool.csproj", "{69AFE5E0-42F5-4D04-885E-69925D64D9BA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Capybara.Tool.Base", "Capybara.Tool.Base\Capybara.Tool.Base.csproj", "{131C63C2-CEC3-4792-B6AD-2409E1E5EC72}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,10 +31,14 @@ Global
 		{92532702-FC2F-4E85-A0F6-12F9997E0217}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{92532702-FC2F-4E85-A0F6-12F9997E0217}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{92532702-FC2F-4E85-A0F6-12F9997E0217}.Release|Any CPU.Build.0 = Release|Any CPU
-		{B44AD881-A1B6-497C-B8C5-697676321AD1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{B44AD881-A1B6-497C-B8C5-697676321AD1}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{B44AD881-A1B6-497C-B8C5-697676321AD1}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{B44AD881-A1B6-497C-B8C5-697676321AD1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{69AFE5E0-42F5-4D04-885E-69925D64D9BA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{69AFE5E0-42F5-4D04-885E-69925D64D9BA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{69AFE5E0-42F5-4D04-885E-69925D64D9BA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{69AFE5E0-42F5-4D04-885E-69925D64D9BA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{131C63C2-CEC3-4792-B6AD-2409E1E5EC72}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{131C63C2-CEC3-4792-B6AD-2409E1E5EC72}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{131C63C2-CEC3-4792-B6AD-2409E1E5EC72}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{131C63C2-CEC3-4792-B6AD-2409E1E5EC72}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

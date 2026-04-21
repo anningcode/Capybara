@@ -1,0 +1,294 @@
+{
+  "users": [
+    {
+      "id": "c34c9eaf-e9f8-4da7-895e-179f09918391",
+      "roleId": 1,
+      "name": "张三",
+      "age": 25,
+      "sex": 1,
+      "height": 175,
+      "weight": 70,
+      "remarks": "测试用户"
+    },
+    {
+      "id": "0bdb51bc34a9422aa7f39979c7bfb7e9",
+      "subRoleIds": [],
+      "roleId": 2,
+      "name": "李四",
+      "age": 31,
+      "sex": 1,
+      "height": 165,
+      "weight": 65,
+      "remarks": "测试用户"
+    }
+  ],
+  "roles": [
+    {
+      "id": 1,
+      "name": "运维经理",
+      "subRoleIds": [ 2 ],
+      "llmAddress": "127.0.0.1:8899",
+      "modelId": 2,
+      "maxTokens": 8192,
+      "temperature": 0.5,
+      "thinking": true,
+      "isSubAgent": false,
+      "prompts": [ 10, 12 ],
+      "skills": [ 1, 2, 3, 4 ],
+      "tools": [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 ],
+      "middles": [],
+      "remarks": "运维经理"
+    },
+    {
+      "id": 2,
+      "name": "时间查询专员",
+      "llmAddress": "127.0.0.1:8899",
+      "modelId": 2,
+      "maxTokens": 4096,
+      "temperature": 0.5,
+      "thinking": true,
+      "isSubAgent": true,
+      "prompts": [ 1, 10, 12 ],
+      "skills": [],
+      "tools": [ 5, 6 ],
+      "middles": [],
+      "remarks": "时间查询专员"
+    }
+  ],
+  "models": [
+    {
+      "id": 1,
+      "modelName": "deepseek-chat",
+      "isSubAgent": false,
+      "remarks": "适用复杂推理任务"
+    },
+    {
+      "id": 2,
+      "modelName": "qwen3.5-plus",
+      "isSubAgent": true,
+      "remarks": "适用复杂多模态任务"
+    },
+    {
+      "id": 3,
+      "modelName": "qwen3.5:35b",
+      "isSubAgent": false,
+      "remarks": "适用简单任务"
+    },
+    {
+      "id": 4,
+      "modelName": "qwen3:30b",
+      "isSubAgent": false,
+      "remarks": "适用简单多模态任务"
+    },
+    {
+      "id": 5,
+      "modelName": "deepseek-r1:8b",
+      "isSubAgent": false,
+      "remarks": "适用简单多模态任务"
+    },
+    {
+      "id": 6,
+      "modelName": "qwen3-vl:32b",
+      "isSubAgent": false,
+      "remarks": "适用简单多模态任务"
+    },
+    {
+      "id": 7,
+      "modelName": "qwen3-vl:4b",
+      "isSubAgent": false,
+      "remarks": "适用简单多模态任务"
+    },
+    {
+      "id": 8,
+      "modelName": "minimax-m2:cloud",
+      "isSubAgent": false,
+      "remarks": "适用简单多模态任务"
+    },
+    {
+      "id": 9,
+      "modelName": "qwen3.5:27b",
+      "isSubAgent": false,
+      "remarks": "适用简单任务"
+    },
+    {
+      "id": 10,
+      "modelName": "qwen3.5-27b-claude-4.6-opus-reasoning-distilled",
+      "isSubAgent": false,
+      "remarks": "适用简单任务"
+    },
+    {
+      "id": 11,
+      "modelName": "qwen3-vl-32b-instruct",
+      "isSubAgent": false,
+      "remarks": "适用简单任务"
+    },
+    {
+      "id": 12,
+      "modelName": "fredrezones55/qwen3.5-opus:27b",
+      "isSubAgent": false,
+      "remarks": "适用简单任务"
+    }
+  ],
+  "prompts": [
+    {
+      "id": 1,
+      "promptValue": "你是一个时间查询专员.",
+      "remarks": "时间查询"
+    },
+    {
+      "id": 2,
+      "promptValue": "你是一个专业的程序员.",
+      "remarks": "后端程序员"
+    },
+    {
+      "id": 3,
+      "promptValue": "你是一个硬盘查询专员",
+      "remarks": "运维工程师"
+    },
+    {
+      "id": 4,
+      "promptValue": "## 角色设定\n你是一位严谨的思维分析助手。在回答任何问题之前，你必须严格遵循“先分析，后回答”的流程。\n\n## 核心指令\n请按照以下两步流程处理我的问题：\n\n### 第一步：深度分析\n在思考框内（如果可用）或回答的开头，请清晰阐述你的分析过程，包括：\n1.  **问题理解**：用自己的话复述一遍我的问题，确保理解无误。\n2.  **可行性评估**：\n    *   这个问题是否有明确的答案？\n    *   解决这个问题需要哪些信息或能力？（例如：需要实时数据、需要专业知识、需要创意生成、需要明确指令等）\n    *   如果信息不足或无法执行，**明确指出限制是什么**，并**给出具体的建议**（例如：需要我补充什么信息？可以建议我开启联网搜索？可以提供一个折中的解决方案？）。\n3.  **规划路径**：如果问题可行，简要说明你打算如何构建你的回答（例如：先给出结论，再分点阐述理由）。\n\n### 第二步：最终答案\n在“最终答案：”的标记后，基于第一步的分析，给出清晰、直接、有用的回答。",
+      "remarks": "指挥官"
+    },
+    {
+      "id": 10,
+      "promptValue": "系统:windows11,工作目录:f:/vcode,所有输出必须按照markdown格式.",
+      "remarks": "系统环境"
+    },
+    {
+      "id": 11,
+      "promptValue": "你是一个专业的意图分析专家。你的职责是分析用户的输入消息，识别其意图和关键实体。\n\n请按以下格式输出分析结果：\n【意图类型】: <chitchat/knowledge_query/tool_action/complex_task>\n【关键实体】: <提取的关键词和实体列表>\n【分析说明】: <简要说明为什么判断为该意图>\n【建议操作】: <建议下一步应该执行的操作>\n\n意图类别说明：\n- chitchat: 日常闲聊、问候、简单对话\n- knowledge_query: 需要搜索或检索知识来回答的问题\n- tool_action: 需要执行具体操作（如发HTTP请求、读写文件等）\n- complex_task: 复杂任务，需要多个步骤才能完成\n\n始终用中文回复。保持分析简洁准确。",
+      "remarks": "时间查询"
+    },
+    {
+      "id": 12,
+      "promptValue": "请直接给出最终答案，不要输出任何推理过程、思考步骤或中间分析,如果需要用到时间要使用时间工具获取当前时间。",
+      "remarks": "推理限制"
+    }
+  ],
+  "skills": [
+    {
+      "id": 1,
+      "skillName": "email",
+      "confirm": false,
+      "remarks": "邮件"
+    },
+    {
+      "id": 2,
+      "skillName": "notice",
+      "confirm": true,
+      "remarks": "通知"
+    },
+    {
+      "id": 3,
+      "skillName": "xlsx",
+      "confirm": true,
+      "remarks": "xlsx"
+    },
+    {
+      "id": 4,
+      "skillName": "xlsxstyle",
+      "confirm": true,
+      "remarks": "xlsx样式"
+    }
+  ],
+  "tools": [
+    {
+      "id": 1,
+      "toolName": "bash",
+      "confirm": true,
+      "remarks": "执行终端命令"
+    },
+    {
+      "id": 2,
+      "toolName": "write_file",
+      "confirm": true,
+      "remarks": "写文件"
+    },
+    {
+      "id": 3,
+      "toolName": "append_write_file",
+      "confirm": true,
+      "remarks": "追加文件"
+    },
+    {
+      "id": 4,
+      "toolName": "read_file",
+      "confirm": true,
+      "remarks": "读取文件"
+    },
+    {
+      "id": 5,
+      "toolName": "get_current_datetime",
+      "confirm": true,
+      "remarks": "获取当前时间"
+    },
+    {
+      "id": 6,
+      "toolName": "get_current_timestamp",
+      "confirm": true,
+      "remarks": "获取当前时间戳"
+    },
+    {
+      "id": 7,
+      "toolName": "create_guid",
+      "confirm": true,
+      "remarks": "创建UUID"
+    },
+    {
+      "id": 8,
+      "toolName": "execute_skill_script",
+      "confirm": true,
+      "remarks": "执行技能脚本"
+    },
+    {
+      "id": 9,
+      "toolName": "load_skill",
+      "confirm": true,
+      "remarks": "加载技能"
+    },
+    {
+      "id": 10,
+      "toolName": "create_sub_agent",
+      "confirm": true,
+      "remarks": "创建智能体"
+    },
+    {
+      "id": 11,
+      "toolName": "load_sub_agent",
+      "confirm": true,
+      "remarks": "加载智能体"
+    },
+    {
+      "id": 12,
+      "toolName": "wait_for_agents",
+      "confirm": true,
+      "remarks": "等待智能体完成"
+    },
+    {
+      "id": 13,
+      "toolName": "add_download_file",
+      "confirm": true,
+      "remarks": "添加到下载文件列表"
+    },
+    {
+      "id": 14,
+      "toolName": "reuse_sub_agent",
+      "confirm": true,
+      "remarks": "复用子智能体"
+    },
+    {
+      "id": 15,
+      "toolName": "selected",
+      "confirm": true,
+      "remarks": "AI疑问"
+    }
+  ],
+  "middles": [
+    {
+      "id": 1,
+      "middleName": "SystemLayer",
+      "remarks": "系统信息"
+    }
+  ]
+}

@@ -6,4 +6,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Capybara.Models\Capybara.Models.csproj" />
+    <ProjectReference Include="..\Capybara.Tool\Capybara.Tool.csproj" />
+  </ItemGroup>
+
 </Project>

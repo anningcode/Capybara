@@ -1,6 +1,7 @@
 ﻿
 using Capybara;
 using Capybara.Agent;
+using Capybara.entrance;
 using Capybara.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -31,7 +32,6 @@ public class Core
     }
     private bool OnResponse(AgentChatMessageInfo response)
     {
-
         Console.WriteLine(JsonConvert.SerializeObject(response));
 
         if (response.type == AgentChatToolCallResponseInfo.type)
@@ -104,6 +104,26 @@ public class Core
 
             agentRuntime_?.Request(request);
         }
+        else if (response.type == AgentChatPlanningResponseInfo.type)
+        {
+            AgentChatPlanningResponseInfo? value = JsonConvert.DeserializeObject<AgentChatPlanningResponseInfo>(response.data) ?? new();
+
+            foreach (var item in value.plannings)
+            {
+                if (item.type == "COMPLETED")
+                {
+                    Console.WriteLine($"-------------------------已完成:{item.content}---------------------");
+                }
+                else if (item.type == "INPROGRESS")
+                {
+                    Console.WriteLine($"-------------------------执行中:{item.content}---------------------");
+                }
+                else
+                {
+                    Console.WriteLine($"-------------------------待执行:{item.content}---------------------");
+                }
+            }
+        }
         return true;
     }
 }
@@ -111,6 +131,10 @@ class Program
 {
     static void Main(string[] args)
     {
+        //ChatEntrance chatEntrance = new ChatEntrance();
+        //chatEntrance.Init();
+        //Thread.Sleep(Timeout.Infinite);
+        //return;
         Core core = new Core();
         string sessionId = "ff102885-4439-4046-850c-09d3dab4d1ed";
         string userId = "c34c9eaf-e9f8-4da7-895e-179f09918391";
@@ -120,7 +144,7 @@ class Program
         request.type = AgentChatQuestionRequestInfo.type;
         request.sessionId = sessionId;
         request.userId = userId;
-        request.data = JsonConvert.SerializeObject(new AgentChatQuestionRequestInfo { content = "帮我创建几个子智能体分别查看几个硬盘都有哪些文件夹,查询那个几个盘请询问用户?" });
+        request.data = JsonConvert.SerializeObject(new AgentChatQuestionRequestInfo { content = "创建子之智能体帮我查看一下本电脑上所有磁盘根目录下都有那些文件夹,授权先先规划一下任务." });
         // request.data = JsonConvert.SerializeObject(new AgentChatQuestionRequestInfo { content = "帮我看一下几点了?" });
         // request.data = JsonConvert.SerializeObject(new AgentChatQuestionRequestInfo { content = "帮我创建1个子智能体查看D盘都有哪些文件夹?" });
         core.Request(request);

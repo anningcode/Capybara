@@ -3,12 +3,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Metadata;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
-using static System.Collections.Specialized.BitVector32;
+using System.IO;
 
 namespace Capybara.Agent
 {
@@ -26,30 +21,48 @@ namespace Capybara.Agent
         // 请求
         public void Request(AgentChatMessageInfo request)
         {
+
             if (request.type == AgentChatQuestionRequestInfo.type)
             {
                 var value = JsonConvert.DeserializeObject<AgentChatQuestionRequestInfo>(request.data);
-                if (value == null) return;
+                if (value == null)
+                {
+                    Response(request, AgentChatErrorResponseInfo.type, new AgentChatErrorResponseInfo { message = "收到用户问题,失败反序列化为空!" });
+                    return;
+                }
                 Request(request, value);
             }
             else if (request.type == AgentChatToolConfirmationRequestInfo.type)
             {
                 var value = JsonConvert.DeserializeObject<AgentChatToolConfirmationRequestInfo>(request.data);
-                if (value == null) return;
+                if (value == null)
+                {
+                    Response(request, AgentChatErrorResponseInfo.type, new AgentChatErrorResponseInfo { message = "收到工具确认,失败反序列化为空!" });
+                    return;
+                }
                 Request(request, value);
             }
             else if (request.type == AgentChatSkillConfirmationRequestInfo.type)
             {
                 var value = JsonConvert.DeserializeObject<AgentChatSkillConfirmationRequestInfo>(request.data);
-                if (value == null) return;
+                if (value == null)
+                {
+                    Response(request, AgentChatErrorResponseInfo.type, new AgentChatErrorResponseInfo { message = "收到技能确认,失败反序列化为空!" });
+                    return;
+                }
                 Request(request, value);
             }
             else if (request.type == AgentChatSelectRequestInfo.type)
             {
                 var value = JsonConvert.DeserializeObject<AgentChatSelectRequestInfo>(request.data);
-                if (value == null) return;
+                if (value == null)
+                {
+                    Response(request, AgentChatErrorResponseInfo.type, new AgentChatErrorResponseInfo { message = "收到用户选择,失败反序列化为空!" });
+                    return;
+                }
                 Request(request, value);
             }
+            Response(request, AgentChatTaskResponseInfo.type, new AgentChatTaskResponseInfo { content = "收到请求" });
         }
         // 问题
         private void Request(AgentChatMessageInfo request, AgentChatQuestionRequestInfo question)
@@ -117,6 +130,16 @@ namespace Capybara.Agent
             {
                 ExecuteQuestion(session);
             }
+            // 上传文件
+            else if (context[index].role == "assistant" && IsDownloadFile(context[index].toolCalls))
+            {
+                OnDownloadFile(session, context[index].toolCalls.Where(n => n.name == "add_download_file" && n.response == null).ToList()[0]);
+            }
+            // 规划
+            else if (context[index].role == "assistant" && IsPlanning(context[index].toolCalls))
+            {
+                OnPlanning(session, context[index].toolCalls.Where(n => n.name == "planning" && n.response == null).ToList()[0]);
+            }
             // 用户选择
             else if (context[index].role == "assistant" && IsSelected(context[index].toolCalls))
             {
@@ -162,7 +185,7 @@ namespace Capybara.Agent
                 Response(session, AgentChatEndResponseInfo.type, new AgentChatEndResponseInfo { content = "结束" });
                 if (!string.IsNullOrEmpty(session.GetSession().parentAgentId))
                 {
-                    ActivateParentAgent(session);
+                    OnActivateParentAgent(session);
                 }
                 else
                 {
@@ -180,11 +203,13 @@ namespace Capybara.Agent
             if (response.success)
             {
                 session.AddAssistantMessage(response.think, response.answer, response.toolCalls);
-                
+                session.GetSession().message.type = -1;
+                Request(session);
             }
-            Console.WriteLine(JsonConvert.SerializeObject(response));
-            session.GetSession().message.type = -1;
-            Request(session);
+            else 
+            {
+                Response(session, AgentChatErrorResponseInfo.type, new AgentChatErrorResponseInfo { message = response.message });
+            }
         }
         // 执行工具
         private void ExecuteTools(AgentChatSession session)
@@ -305,6 +330,18 @@ namespace Capybara.Agent
                 }
             }
         }
+        // 文件上传
+        private bool IsDownloadFile(List<AgentLLMItemFuncRequestInfo> toolCalls)
+        {
+            foreach (var item in toolCalls)
+            {
+                if (item.response == null)
+                {
+                    return item.name == "add_download_file";
+                }
+            }
+            return false;
+        }
         // 选择
         private bool IsSelected(List<AgentLLMItemFuncRequestInfo> toolCalls)
         {
@@ -378,7 +415,9 @@ namespace Capybara.Agent
                         item.name != "selected" &&
                         item.name != "create_sub_agent" &&
                         item.name != "load_sub_agent" &&
-                        item.name != "reuse_sub_agent";
+                        item.name != "reuse_sub_agent" &&
+                        item.name != "planning" &&
+                        item.name != "add_download_file";
                 }
             }
             return false;
@@ -395,46 +434,82 @@ namespace Capybara.Agent
             }
             return false;
         }
-        // 激活父智能体
-        private void ActivateParentAgent(AgentChatSession session)
+        // 判断是不是规划
+        private bool IsPlanning(List<AgentLLMItemFuncRequestInfo> toolCalls)
         {
-            var parentAgents = session.GetSession().parentAgentId.Split('/').ToList();
-            string agentId = parentAgents[parentAgents.Count - 1];
-            parentAgents.RemoveAt(parentAgents.Count - 1);
-
-            AgentChatSession sessionParent = new(new AgentChatMessageInfo { agentId = agentId, parentAgentId = string.Join('/', parentAgents), sessionId = session.GetSession().message.sessionId });
-
-            var subAgents = sessionParent.SubAgentComplete();
-
-            if (subAgents.Count == 0) return;
-
-            List<string> subAgentAnswer = new();
-
-            foreach (var item in subAgents)
+            foreach (var item in toolCalls)
             {
-                AgentChatSession sessionAnswer = new(new AgentChatMessageInfo { agentId = item, parentAgentId = session.GetSession().parentAgentId });
-
-                if (!sessionAnswer.LoadSession()) return;
-
-                subAgentAnswer.Add($"智能体名称:{sessionAnswer.GetSession().agentName},结论:{sessionAnswer.GetSession().request.context[sessionAnswer.GetSession().request.context.Count - 1].answer}");
+                if (item.response == null)
+                {
+                    return item.name == "planning";
+                }
             }
+            return false;
+        }
+        // 激活父智能体
+        private void OnActivateParentAgent(AgentChatSession session)
+        {
+            Console.WriteLine("----------------------------------------OnActivateParentAgent----------------------------------------------");
+            var sessionParent = session.Complete();
+            if (sessionParent == null) return;
 
-            var toolCalls = sessionParent.GetSession().request.context[sessionParent.GetSession().request.context.Count - 1].toolCalls;
+            var context = sessionParent.GetSession().request.context;
+            var type = sessionParent.GetSession().message.type;
+            if (context.Count == 0) return;
+            int index = context.Count - 1;
 
-            foreach (var toolCall in toolCalls)
+            if (!IsWaitForAgent(context[index].toolCalls)) return;
+
+            try
             {
-                if (toolCall.name != "wait_for_agents") continue;
-
-                toolCall.response = string.Join('\n', subAgentAnswer);
-
-                break;
+                OnWaitForAgent(sessionParent, context[index].toolCalls.Where(n => n.name == "wait_for_agents" && n.response == null).ToList()[0]);
             }
-            Request(sessionParent);
+            catch { }
+        }
+        // 添加到下载列表
+        private void OnDownloadFile(AgentChatSession session, AgentLLMItemFuncRequestInfo toolCall)
+        {
+            try
+            {
+                var json = JObject.Parse(toolCall.arguments);
+                if (json == null) throw new Exception();
+                if (!json.ContainsKey("path")) throw new Exception();
+                string? path = json["path"]?.ToObject<string>();
+                if (path == null) throw new Exception();
+
+                if (File.Exists(path))
+                {
+                    byte[] fileBytes = File.ReadAllBytes(path);
+                    string base64String = Convert.ToBase64String(fileBytes);
+                    Response(session, AgentChatUploadResponseInfo.type, new AgentChatUploadResponseInfo { name = (new FileInfo(path)).Name, data = base64String });
+
+                    toolCall.response = "添加成功!";
+                    session.GetSession().message.type = -1;
+                    Request(session);
+                }
+                else
+                {
+                    toolCall.response = "添加失败,文件不存在!";
+                    session.GetSession().message.type = -1;
+                    Request(session);
+                }
+            }
+            catch
+            {
+                toolCall.response = "调用失败,参数错误!";
+                session.GetSession().message.type = -1;
+                Request(session);
+            }
         }
         // 等待子智能体
         private void OnWaitForAgent(AgentChatSession session, AgentLLMItemFuncRequestInfo toolCall)
         {
-            
+            Console.WriteLine("----------------------------------------OnWaitForAgent----------------------------------------------");
+
+            if (!session.LoadSubAgentAnswers()) return;
+
+            session.GetSession().message.type = -1;
+            Request(session);
         }
         // AI疑问,列出选项供用户选择解答疑问
         private void OnSelected(AgentChatSession session, AgentLLMItemFuncRequestInfo toolCall)
@@ -461,6 +536,44 @@ namespace Capybara.Agent
                     session.GetSession().message.type = -1;
                     Request(session);
                 }
+            }
+            catch
+            {
+                toolCall.response = "调用失败,参数错误!";
+                session.GetSession().message.type = -1;
+                Request(session);
+            }
+        }
+        // 智能体规划
+        private void OnPlanning(AgentChatSession session, AgentLLMItemFuncRequestInfo toolCall)
+        {
+            try
+            {
+                var json = JObject.Parse(toolCall.arguments);
+                if (json == null) throw new Exception();
+                if (!json.ContainsKey("list")) throw new Exception();
+                List<string>? list = json["list"]?.ToObject<List<string>>();
+                if (list == null) throw new Exception();
+
+                AgentChatPlanningResponseInfo param = new();
+                foreach (var item in list)
+                {
+                    AgentChatPlanningItemInfo addItem = new();
+                    int index = item.IndexOf(':');
+                    if (index == -1) throw new Exception();
+                    string type = item.Substring(0, index);
+                    string content = item.Substring(index + 1);
+
+                    addItem.type = type.ToUpper();
+                    addItem.content = content;
+                    param.plannings.Add(addItem);
+                }
+
+                Response(session, AgentChatPlanningResponseInfo.type, param);
+
+                toolCall.response = "执行成功";
+                session.GetSession().message.type = -1;
+                Request(session);
             }
             catch
             {
@@ -578,23 +691,21 @@ namespace Capybara.Agent
                     agentId = agentId,
                     agentName = agentName,
                     parentAgentId = string.IsNullOrEmpty(session.GetSession().parentAgentId) ? session.GetSession().agentId : session.GetSession().parentAgentId + "/" + session.GetSession().agentId,
-                    subAgentCount = 0,
-                    subAgentIds = new List<string>(),
                     config = config,
                     message = message,
                     request = request
                 };
 
-                session.GetSession().subAgentCount++;
-                session.GetSession().subAgentIds.Add(param.agentId);
-
                 AgentChatSession newSession = new(param);
                 newSession.GetSession().msgId = Guid.NewGuid().ToString();
                 Request(newSession);
 
-
                 toolCall.response = $"创建成功,智能体ID: {agentId}";
+               
+                Console.WriteLine("====================================================================");
+
                 session.GetSession().message.type = -1;
+                session.AddSubAgent(agentId);
                 Request(session);
             }
             catch 
@@ -639,6 +750,7 @@ namespace Capybara.Agent
                 }
 
                 session.GetSession().message.type = -1;
+                session.AddSubAgent(agentId);
                 Request(session);
             }
             catch 
@@ -681,6 +793,7 @@ namespace Capybara.Agent
                 }
 
                 session.GetSession().message.type = -1;
+                session.AddSubAgent(agentId);
                 Request(session);
             }
             catch
@@ -703,6 +816,19 @@ namespace Capybara.Agent
             }
         }
         // 响应
+        private bool Response(AgentChatMessageInfo request, int type, object t)
+        {
+            AgentChatMessageInfo response = new AgentChatMessageInfo();
+            response.sessionId = request.sessionId;
+            response.agentId = request.agentId;
+            response.agentName = request.agentName;
+            response.msgId = request.msgId;
+            response.parentAgentId = request.parentAgentId;
+            response.type = type;
+            response.data = JsonConvert.SerializeObject(t);
+            return onResponse.Invoke(response);
+        }
+        // 响应
         private bool Response(AgentChatSession session,int type, object t)
         {
             AgentChatMessageInfo response = new AgentChatMessageInfo();
@@ -712,7 +838,6 @@ namespace Capybara.Agent
             response.msgId = session.GetSession().msgId;
             response.parentAgentId = session.GetSession().parentAgentId;
             response.type = type;
-
             // 回复收到消息
             if (response.type == AgentChatTaskResponseInfo.type)
             {
@@ -764,7 +889,7 @@ namespace Capybara.Agent
                 response.data = JsonConvert.SerializeObject(t);
             }
             // 错误
-            else if (response.type == AgentChatErrorRespResponseInfo.type)
+            else if (response.type == AgentChatErrorResponseInfo.type)
             {
                 response.data = JsonConvert.SerializeObject(t);
             }

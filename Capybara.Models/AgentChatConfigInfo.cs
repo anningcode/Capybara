@@ -106,10 +106,6 @@ namespace Capybara.Models
         public string agentName { get; set; } = string.Empty;
         // 父智能体
         public string parentAgentId { get; set; } = string.Empty;
-        // 子智能体数量
-        public int subAgentCount { get; set; } = 0;
-        // 子智能体ID列表
-        public List<string> subAgentIds { get; set; } = new List<string>();
         // 消息ID
         public string msgId { get; set; } = string.Empty;
         // 智能体消息

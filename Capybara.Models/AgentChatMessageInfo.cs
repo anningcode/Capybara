@@ -110,14 +110,16 @@ namespace Capybara.Models
     public class AgentChatUploadResponseInfo
     {
         public const int type = 8;
+        // 文件名称
+        public string name { get; set; } = string.Empty;
         // 数据base64
         public string data { get; set; } = string.Empty;
     }
     // 规划内容
     public class AgentChatPlanningItemInfo 
     {
-        // 类型,0:未处理, 1:处理中, 2:处理完成
-        public int type { get; set; } = 0;
+        // 类型,COMPLETED:已完成, INPROGRESS:执行中, PENDING:待执行
+        public string type { get; set; } = string.Empty;
         // 规划正文
         public string content { get; set; } = string.Empty;
     }
@@ -129,7 +131,7 @@ namespace Capybara.Models
         public List<AgentChatPlanningItemInfo> plannings { get; set; } = new List<AgentChatPlanningItemInfo>();
     }
     // 响应,错误
-    public class AgentChatErrorRespResponseInfo
+    public class AgentChatErrorResponseInfo
     {
         public const int type = 10;
         // 错误消息
@@ -152,6 +154,8 @@ namespace Capybara.Models
     // 交互消息
     public class AgentChatMessageInfo
     {
+        // 响应地址
+        public string address { get; set; } = string.Empty;
         // 用户id
         public string userId { get; set; } = string.Empty;
         // 会话ID,区分客户端

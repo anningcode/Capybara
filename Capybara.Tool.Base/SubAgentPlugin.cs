@@ -13,7 +13,7 @@ namespace Capybara.Tool.Base
     public class SubAgentPlugin : IToolPlugin
     {
         [AgentFunction("create_sub_agent")]
-        [Description("创建子智能体")]
+        [Description("创建子智能体,配合wait_for_agents工具使用.")]
         public string CreateSubAgent(
             [Description("智能体名称")] string agentName,
             [Description("提示词")][NoRequired] string prompt,
@@ -28,7 +28,7 @@ namespace Capybara.Tool.Base
         }
 
         [AgentFunction("load_sub_agent")]
-        [Description("加载子智能体")]
+        [Description("加载子智能体,配合wait_for_agents工具使用.")]
         public string LoadSubAgent(
             [Description("使用用户提供的角色ID作为参数")] int id, 
             [Description("问题")] string content)
@@ -37,7 +37,7 @@ namespace Capybara.Tool.Base
         }
 
         [AgentFunction("reuse_sub_agent")]
-        [Description("复用子智能体")]
+        [Description("复用子智能体,配合wait_for_agents工具使用.")]
         public string ReuseSubAgent(
             [Description("要复用的子智能体ID,加载或创建的子智能体ID")] string agentId,
             [Description("问题")] string content) 
@@ -46,7 +46,7 @@ namespace Capybara.Tool.Base
         }
 
         [AgentFunction("wait_for_agents")]
-        [Description("等待子智能体结果,配合create_sub_agent、load_sub_agent、reuse_sub_agent一起使用,")]
+        [Description("等待子智能体结果")]
         public string WaitForAgent()
         {
             return string.Empty;

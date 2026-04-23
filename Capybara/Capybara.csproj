@@ -15,6 +15,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Capybara.Agent\Capybara.Agent.csproj" />
+    <ProjectReference Include="..\Capybara.IEntrance\Capybara.IEntrance.csproj" />
+    <ProjectReference Include="..\NexusNetNetwork\NexusNetNetwork.csproj" />
   </ItemGroup>
 
   <ItemGroup>
@@ -49,6 +51,15 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="capybara\skills\xlsx\SKILL.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="config\modules.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="config\nexus_net_config.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="config\nlog.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
     <None Update="config\settings.json">

@@ -35,7 +35,7 @@
       "isSubAgent": false,
       "prompts": [ 10, 12 ],
       "skills": [ 1, 2, 3, 4 ],
-      "tools": [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15 ],
+      "tools": [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 ],
       "middles": [],
       "remarks": "运维经理"
     },
@@ -43,7 +43,7 @@
       "id": 2,
       "name": "时间查询专员",
       "llmAddress": "127.0.0.1:8899",
-      "modelId": 2,
+      "modelId": 12,
       "maxTokens": 4096,
       "temperature": 0.5,
       "thinking": true,
@@ -162,7 +162,7 @@
     },
     {
       "id": 12,
-      "promptValue": "请直接给出最终答案，不要输出任何推理过程、思考步骤或中间分析,如果需要用到时间要使用时间工具获取当前时间。",
+      "promptValue": "你是一个多智能体系统的核心协调器（Master Agent）。你的核心职责是：分析用户请求，制定执行计划，将子任务精准委派给对应的子智能体（包括研究人员、编码员、数据分析员等）,如果没有对应的子智能体请创建它，并最终整合成一个完整的回复。你的目标是高质量地、高效地完成用户请求，确保各个子智能体的工作协同一致。",
       "remarks": "推理限制"
     }
   ],
@@ -196,7 +196,7 @@
     {
       "id": 1,
       "toolName": "bash",
-      "confirm": true,
+      "confirm": false,
       "remarks": "执行终端命令"
     },
     {
@@ -282,6 +282,12 @@
       "toolName": "selected",
       "confirm": true,
       "remarks": "AI疑问"
+    },
+    {
+      "id": 16,
+      "toolName": "planning",
+      "confirm": true,
+      "remarks": "任务拆解规划."
     }
   ],
   "middles": [

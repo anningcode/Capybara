@@ -27,6 +27,8 @@ namespace Capybara.Agent
         public AgentChatSession(AgentChatMessageInfo request)
         {
             session_.message = request;
+            session_.agentId = request.agentId;
+            session_.parentAgentId = request.parentAgentId;
         }
         public AgentChatSession(AgentChatSessionInfo session,bool refactor = true)
         {
@@ -254,45 +256,7 @@ namespace Capybara.Agent
         // 加载session
         public bool LoadSession()
         {
-            return LoadSession(session_.message.agentId, session_.message.parentAgentId);
-        }
-        // 递减
-        public List<string> SubAgentComplete()
-        {
-            List<string> result = new List<string>();
-            lock (locker_)
-            {
-                try
-                {
-                    // 读取
-                    {
-                        string path = $"capybara/memory/context/{(string.IsNullOrEmpty(session_.message.parentAgentId) ? session_.message.agentId : session_.message.parentAgentId + "/" + session_.message.agentId)}/main.json";
-                        if (!File.Exists(path)) throw new Exception();
-                        string json = File.ReadAllText(path);
-                        var session = JsonConvert.DeserializeObject<AgentChatSessionInfo>(json);
-                        if (session == null) throw new Exception();
-                        session.message = session_.message;
-                        session_ = session;
-                    }
-                    session_.subAgentCount--;
-                    if (session_.subAgentCount == 0)
-                    {
-                        result = session_.subAgentIds;
-                    }
-                    // 保存
-                    {
-                        string path = $"capybara/memory/context/{(string.IsNullOrEmpty(session_.parentAgentId) ? session_.agentId : session_.parentAgentId + "/" + session_.agentId)}/";
-                        if (!Directory.Exists(path))
-                        {
-                            Directory.CreateDirectory(path);
-                            if (!Directory.Exists(path)) throw new Exception();
-                        }
-                        File.WriteAllText($"{path}/main.json", JsonConvert.SerializeObject(session_));
-                    }
-                }
-                catch { }
-            }
-            return result;
+            return LoadSession(session_.agentId, session_.parentAgentId);
         }
         // 加载session
         public bool LoadSession(string agentId,string parentAgentId = "")
@@ -334,6 +298,126 @@ namespace Capybara.Agent
             {
                 Console.WriteLine(ex.Message);
             }
+        }
+        // 加载子智能体信息
+        public bool LoadSubAgentAnswers()
+        {
+            try
+            {
+                lock (locker_)
+                {
+                    List<string> result = new List<string>();
+                    string path = $"capybara/memory/context/{(string.IsNullOrEmpty(session_.parentAgentId) ? session_.agentId : session_.parentAgentId + "/" + session_.agentId)}/subagent.json";
+                    if (!File.Exists(path)) throw new Exception();
+                    string json = File.ReadAllText(path);
+                    var subAgent = JsonConvert.DeserializeObject<AgentChatSubAgentInfo>(json);
+                    if (subAgent == null) throw new Exception();
+
+                    if (subAgent.ids.Count == 0 && subAgent.count == 0)
+                    {
+                        result.Add("没有发现智能体.");
+                    }
+                    else if (subAgent.ids.Count > 0 && subAgent.count == 0)
+                    {
+                        
+                        foreach (var item in subAgent.ids)
+                        {
+                            string value = LoadSubAgentAnswer(item);
+                            result.Add($"智能体ID:{item}, 结论:{value}");
+                        }
+                    }
+                    if (result.Count > 0)
+                    {
+                        var context = session_.request.context;
+                        if (context.Count == 0) return false;
+                        int index = context.Count - 1;
+
+                        foreach (var item in context[index].toolCalls)
+                        {
+                            if (item.response == null && item.name == "wait_for_agents")
+                            {
+                                item.response = string.Join('\n', result);
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+            catch { }
+            return false;
+        }
+        // 加载子智能体结论
+        private string LoadSubAgentAnswer(string subAgentId)
+        {
+            try
+            {
+                string path = $"capybara/memory/context/{(string.IsNullOrEmpty(session_.parentAgentId) ? session_.agentId : session_.parentAgentId + "/" + session_.agentId)}/{subAgentId}/main.json";
+                if (!File.Exists(path)) throw new Exception();
+                string json = File.ReadAllText(path);
+                var session = JsonConvert.DeserializeObject<AgentChatSessionInfo>(json);
+                if (session == null) throw new Exception();
+                if (session.request.context.Count == 0) throw new Exception();
+                if (session.request.context[session.request.context.Count - 1].role != "assistant") throw new Exception();
+                return session.request.context[session.request.context.Count - 1].answer;
+            }
+            catch {  }
+            return string.Empty;
+        }
+        // 添加子智能体
+        public void AddSubAgent(string agentId)
+        {
+            try
+            {
+                lock (locker_)
+                {
+                    AgentChatSubAgentInfo? subAgent = new();
+                    string path = $"capybara/memory/context/{(string.IsNullOrEmpty(session_.parentAgentId) ? session_.agentId : session_.parentAgentId + "/" + session_.agentId)}/subagent.json";
+                    if (File.Exists(path))
+                    {
+                        string json = File.ReadAllText(path);
+                        subAgent = JsonConvert.DeserializeObject<AgentChatSubAgentInfo>(json);
+                        if (subAgent == null) throw new Exception();
+                    }
+                    subAgent.count++;
+                    subAgent.ids.Add(agentId);
+                    File.WriteAllText(path, JsonConvert.SerializeObject(subAgent));
+                }
+            }
+            catch
+            { 
+            }
+        }
+        // 子智能体完成
+        public AgentChatSession? Complete()
+        {
+            if (string.IsNullOrEmpty(session_.parentAgentId)) return null;
+            try
+            {
+                AgentChatSubAgentInfo? subAgent = new AgentChatSubAgentInfo();
+
+                lock (locker_)
+                {
+                    string path = $"capybara/memory/context/{session_.parentAgentId}/subagent.json";
+                    if (!File.Exists(path)) throw new Exception();
+                    string json = File.ReadAllText(path);
+                    subAgent = JsonConvert.DeserializeObject<AgentChatSubAgentInfo>(json);
+                    if (subAgent == null) throw new Exception();
+                    subAgent.count--;
+                    File.WriteAllText(path, JsonConvert.SerializeObject(subAgent));
+                }
+
+                if (subAgent.count == 0)
+                {
+                    List<string> paths = session_.parentAgentId.Split('/').ToList();
+                    string agentId = paths[paths.Count - 1];
+                    paths.RemoveAt(paths.Count - 1);
+                    AgentChatSession session = new AgentChatSession(new AgentChatMessageInfo { agentId = agentId, parentAgentId = string.Join('/', paths), sessionId = session_.message.sessionId });
+                    session.LoadSession();
+                    return session;
+                }
+            }
+            catch { }
+            return null;
         }
     }
 }

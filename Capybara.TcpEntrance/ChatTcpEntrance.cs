@@ -39,7 +39,7 @@ namespace Capybara.TcpEntrance
                 TcpClientNetwork? session = GetSession(response.sessionId);
                 if (session == null) return false;
                 if (!session.Send(JsonConvert.SerializeObject(response) + "\n")) return false;
-                if (response.type == 8)
+                if (response.type == 12)
                 {
                     session.Stop();
                 }

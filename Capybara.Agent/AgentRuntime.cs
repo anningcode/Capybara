@@ -135,10 +135,15 @@ namespace Capybara.Agent
             {
                 OnDownloadFile(session, context[index].toolCalls.Where(n => n.name == "add_download_file" && n.response == null).ToList()[0]);
             }
-            // 规划
-            else if (context[index].role == "assistant" && IsPlanning(context[index].toolCalls))
+            // 规划任务
+            else if (context[index].role == "assistant" && IsTaskPlanning(context[index].toolCalls))
             {
-                OnPlanning(session, context[index].toolCalls.Where(n => n.name == "planning" && n.response == null).ToList()[0]);
+                OnTaskPlanning(session, context[index].toolCalls.Where(n => n.name == "task_planning" && n.response == null).ToList()[0]);
+            }
+            // 更新任务
+            else if (context[index].role == "assistant" && IsTaskUpdate(context[index].toolCalls))
+            {
+                OnTaskUpdate(session, context[index].toolCalls.Where(n => n.name == "task_update" && n.response == null).ToList()[0]);
             }
             // 用户选择
             else if (context[index].role == "assistant" && IsSelected(context[index].toolCalls))
@@ -416,7 +421,8 @@ namespace Capybara.Agent
                         item.name != "create_sub_agent" &&
                         item.name != "load_sub_agent" &&
                         item.name != "reuse_sub_agent" &&
-                        item.name != "planning" &&
+                        item.name != "task_planning" &&
+                        item.name != "task_update" &&
                         item.name != "add_download_file";
                 }
             }
@@ -435,13 +441,25 @@ namespace Capybara.Agent
             return false;
         }
         // 判断是不是规划
-        private bool IsPlanning(List<AgentLLMItemFuncRequestInfo> toolCalls)
+        private bool IsTaskPlanning(List<AgentLLMItemFuncRequestInfo> toolCalls)
         {
             foreach (var item in toolCalls)
             {
                 if (item.response == null)
                 {
-                    return item.name == "planning";
+                    return item.name == "task_planning";
+                }
+            }
+            return false;
+        }
+        // 判断是不是更新任务
+        private bool IsTaskUpdate(List<AgentLLMItemFuncRequestInfo> toolCalls)
+        {
+            foreach (var item in toolCalls)
+            {
+                if (item.response == null)
+                {
+                    return item.name == "task_update";
                 }
             }
             return false;
@@ -544,32 +562,72 @@ namespace Capybara.Agent
                 Request(session);
             }
         }
-        // 智能体规划
-        private void OnPlanning(AgentChatSession session, AgentLLMItemFuncRequestInfo toolCall)
+        // 智能体规划任务
+        private void OnTaskPlanning(AgentChatSession session, AgentLLMItemFuncRequestInfo toolCall)
         {
             try
             {
                 var json = JObject.Parse(toolCall.arguments);
                 if (json == null) throw new Exception();
-                if (!json.ContainsKey("list")) throw new Exception();
-                List<string>? list = json["list"]?.ToObject<List<string>>();
+                if (!json.ContainsKey("tasks")) throw new Exception();
+                List<string>? list = json["tasks"]?.ToObject<List<string>>();
                 if (list == null) throw new Exception();
 
                 AgentChatPlanningResponseInfo param = new();
                 foreach (var item in list)
                 {
                     AgentChatPlanningItemInfo addItem = new();
-                    int index = item.IndexOf(':');
+                    int index = item.IndexOf('.');
                     if (index == -1) throw new Exception();
-                    string type = item.Substring(0, index);
-                    string content = item.Substring(index + 1);
+                    string content = item;
 
-                    addItem.type = type.ToUpper();
+                    addItem.id = param.plannings.Count + 1;
+                    addItem.type = "PENDING";
                     addItem.content = content;
                     param.plannings.Add(addItem);
                 }
 
+                // 保存
+                if(!session.SavePlanning(param)) throw new Exception();
+
                 Response(session, AgentChatPlanningResponseInfo.type, param);
+
+                toolCall.response = "执行成功";
+                session.GetSession().message.type = -1;
+                Request(session);
+            }
+            catch
+            {
+                toolCall.response = "调用失败,参数错误!";
+                session.GetSession().message.type = -1;
+                Request(session);
+            }
+        }
+        // 智能体更新任务
+        private void OnTaskUpdate(AgentChatSession session, AgentLLMItemFuncRequestInfo toolCall)
+        {
+            try
+            {
+                var json = JObject.Parse(toolCall.arguments);
+                if (json == null) throw new Exception();
+                if (!json.ContainsKey("tasks")) throw new Exception();
+                List<string>? list = json["tasks"]?.ToObject<List<string>>();
+                if (list == null) throw new Exception();
+
+                List<(int,string)> param = new();
+                foreach (var item in list)
+                {
+                    var values = item.Split(':');
+                    if (values.Length != 2) throw new Exception();
+
+                    param.Add((int.Parse(values[0]), values[1]));
+                }
+
+                // 加载
+                var planning = session.UpdatePlanning(param);
+                if (planning == null) throw new Exception();
+
+                Response(session, AgentChatPlanningResponseInfo.type, planning);
 
                 toolCall.response = "执行成功";
                 session.GetSession().message.type = -1;

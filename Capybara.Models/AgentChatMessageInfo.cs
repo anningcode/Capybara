@@ -59,10 +59,46 @@ namespace Capybara.Models
     public class AgentChatToolCallResponseInfo
     {
         public const int type = 3;
+        private string toolName_ = string.Empty;
+        private string toolParam_ = string.Empty;
         // 工具名称
-        public string toolName { get; set; } = string.Empty;
+        public string toolName
+        {
+            get
+            {
+                return toolName_;
+            }
+            set
+            {
+                if (value.Length > 100)
+                {
+                    toolName_ = value.Substring(0, 100) + " ......";
+                }
+                else
+                {
+                    toolName_ = value;
+                }
+            }
+        }
         // 参数
-        public string toolParam { get; set; } = string.Empty;
+        public string toolParam
+        {
+            get
+            {
+                return toolParam_;
+            }
+            set
+            {
+                if (value.Length > 100)
+                {
+                    toolParam_ = value.Substring(0, 100) + " ......";
+                }
+                else
+                {
+                    toolParam_ = value;
+                }
+            }
+        }
         // 要求用户确认
         public bool confirmation { get; set; } = false;
     }
@@ -70,19 +106,73 @@ namespace Capybara.Models
     public class AgentChatToolResponseInfo
     {
         public const int type = 4;
+        private string response_ = string.Empty;
         // 工具名称
         public string toolName { get; set; } = string.Empty;
         // 工具响应
-        public string response { get; set; } = string.Empty;
+        public string response
+        {
+            get
+            {
+                return response_;
+            }
+            set
+            {
+                if (value.Length > 100)
+                {
+                    response_ = value.Substring(0, 100) + " ......";
+                }
+                else
+                {
+                    response_ = value;
+                }
+            }
+        }
     }
     // 响应,技能
     public class AgentChatSkillCallResponseInfo
     {
         public const int type = 5;
+        private string skillName_ = string.Empty;
+        private string skillParam_ = string.Empty;
         // 技能名称
-        public string skillName { get; set; } = string.Empty;
+        public string skillName
+        {
+            get
+            {
+                return skillName_;
+            }
+            set
+            {
+                if (value.Length > 100)
+                {
+                    skillName_ = value.Substring(0, 100) + " ......";
+                }
+                else
+                {
+                    skillName_ = value;
+                }
+            }
+        }
         // 参数
-        public string skillParam { get; set; } = string.Empty;
+        public string skillParam
+        {
+            get
+            {
+                return skillParam_;
+            }
+            set
+            {
+                if (value.Length > 100)
+                {
+                    skillParam_ = value.Substring(0, 100) + " ......";
+                }
+                else
+                {
+                    skillParam_ = value;
+                }
+            }
+        }
         // 要求用户确认
         public bool confirmation { get; set; } = false;
     }
@@ -90,10 +180,28 @@ namespace Capybara.Models
     public class AgentChatSkillResponseInfo
     {
         public const int type = 6;
+        private string response_ = string.Empty;
         // 技能名称
         public string skillName { get; set; } = string.Empty;
         // 技能响应
-        public string response { get; set; } = string.Empty;
+        public string response
+        {
+            get
+            {
+                return response_;
+            }
+            set
+            {
+                if (value.Length > 100)
+                {
+                    response_ = value.Substring(0, 100) + " ......";
+                }
+                else
+                {
+                    response_ = value;
+                }
+            }
+        }
     }
     // 响应,疑问
     public class AgentChatSelectResponseInfo
@@ -118,8 +226,10 @@ namespace Capybara.Models
     // 规划内容
     public class AgentChatPlanningItemInfo 
     {
+        // 任务编号
+        public int id { get; set; } = 0;
         // 类型,COMPLETED:已完成, INPROGRESS:执行中, PENDING:待执行
-        public string type { get; set; } = string.Empty;
+        public string type { get; set; } = "PENDING";
         // 规划正文
         public string content { get; set; } = string.Empty;
     }

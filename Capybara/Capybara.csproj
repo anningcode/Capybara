@@ -16,6 +16,8 @@
   <ItemGroup>
     <ProjectReference Include="..\Capybara.Agent\Capybara.Agent.csproj" />
     <ProjectReference Include="..\Capybara.IEntrance\Capybara.IEntrance.csproj" />
+    <ProjectReference Include="..\Capybara.NexusNetEntrance\Capybara.NexusNetEntrance.csproj" />
+    <ProjectReference Include="..\Capybara.TcpEntrance\Capybara.TcpEntrance.csproj" />
     <ProjectReference Include="..\NexusNetNetwork\NexusNetNetwork.csproj" />
   </ItemGroup>
 

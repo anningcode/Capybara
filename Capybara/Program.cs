@@ -131,24 +131,21 @@ class Program
 {
     static void Main(string[] args)
     {
-        //ChatEntrance chatEntrance = new ChatEntrance();
-        //chatEntrance.Init();
-        //Thread.Sleep(Timeout.Infinite);
-        //return;
-        Core core = new Core();
-        string sessionId = "ff102885-4439-4046-850c-09d3dab4d1ed";
-        string userId = "c34c9eaf-e9f8-4da7-895e-179f09918391";
-
-        AgentChatMessageInfo request = new AgentChatMessageInfo();
-
-        request.type = AgentChatQuestionRequestInfo.type;
-        request.sessionId = sessionId;
-        request.userId = userId;
-        request.data = JsonConvert.SerializeObject(new AgentChatQuestionRequestInfo { content = "创建子之智能体帮我查看一下本电脑上所有磁盘根目录下都有那些文件夹,授权先先规划一下任务." });
-        // request.data = JsonConvert.SerializeObject(new AgentChatQuestionRequestInfo { content = "帮我看一下几点了?" });
-        // request.data = JsonConvert.SerializeObject(new AgentChatQuestionRequestInfo { content = "帮我创建1个子智能体查看D盘都有哪些文件夹?" });
-        core.Request(request);
-
-        Console.ReadKey();
+        ChatEntrance chatEntrance = new ChatEntrance();
+        chatEntrance.Init();
+        Thread.Sleep(Timeout.Infinite);
+        return;
+        // Core core = new Core();
+        // string sessionId = "ff102885-4439-4046-850c-09d3dab4d1ed";
+        // string userId = "c34c9eaf-e9f8-4da7-895e-179f09918391";
+        // AgentChatMessageInfo request = new AgentChatMessageInfo();
+        // request.type = AgentChatQuestionRequestInfo.type;
+        // request.sessionId = sessionId;
+        // request.userId = userId;
+        // // request.data = JsonConvert.SerializeObject(new AgentChatQuestionRequestInfo { content = "帮我用html+css+js写一个坦克大战游戏,将所有文件添加到下载列表." });
+        // // request.data = JsonConvert.SerializeObject(new AgentChatQuestionRequestInfo { content = "帮我看一下几点了?" });
+        // request.data = JsonConvert.SerializeObject(new AgentChatQuestionRequestInfo { content = "帮我创建1个子智能体查看D盘都有哪些文件夹?,保存到markdown文件,并上传到下载列表." });
+        // core.Request(request);
+        // Console.ReadKey();
     }
 }

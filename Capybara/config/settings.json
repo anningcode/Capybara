@@ -28,14 +28,14 @@
       "name": "运维经理",
       "subRoleIds": [ 2 ],
       "llmAddress": "127.0.0.1:8899",
-      "modelId": 2,
+      "modelId": 12,
       "maxTokens": 8192,
       "temperature": 0.5,
       "thinking": true,
       "isSubAgent": false,
       "prompts": [ 10, 12 ],
       "skills": [ 1, 2, 3, 4 ],
-      "tools": [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16 ],
+      "tools": [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17 ],
       "middles": [],
       "remarks": "运维经理"
     },
@@ -65,7 +65,7 @@
     {
       "id": 2,
       "modelName": "qwen3.5-plus",
-      "isSubAgent": true,
+      "isSubAgent": false,
       "remarks": "适用复杂多模态任务"
     },
     {
@@ -125,6 +125,12 @@
     {
       "id": 12,
       "modelName": "fredrezones55/qwen3.5-opus:27b",
+      "isSubAgent": true,
+      "remarks": "适用简单任务"
+    },
+    {
+      "id": 13,
+      "modelName": "qwen3.6:35b",
       "isSubAgent": false,
       "remarks": "适用简单任务"
     }
@@ -162,7 +168,7 @@
     },
     {
       "id": 12,
-      "promptValue": "你是一个多智能体系统的核心协调器（Master Agent）。你的核心职责是：分析用户请求，制定执行计划，将子任务精准委派给对应的子智能体（包括研究人员、编码员、数据分析员等）,如果没有对应的子智能体请创建它，并最终整合成一个完整的回复。你的目标是高质量地、高效地完成用户请求，确保各个子智能体的工作协同一致。",
+      "promptValue": "先规划一下任务,每个细节都要拆分成小任务单元,没调用一次技能或工具都是一个任务,在做实际的事情,按照任务做一个更新一个,开始做之前要把任务更新成执行中让用户知道当前在做什么,把所有生成的文件添加到下载列表.",
       "remarks": "推理限制"
     }
   ],
@@ -176,19 +182,19 @@
     {
       "id": 2,
       "skillName": "notice",
-      "confirm": true,
+      "confirm": false,
       "remarks": "通知"
     },
     {
       "id": 3,
       "skillName": "xlsx",
-      "confirm": true,
+      "confirm": false,
       "remarks": "xlsx"
     },
     {
       "id": 4,
       "skillName": "xlsxstyle",
-      "confirm": true,
+      "confirm": false,
       "remarks": "xlsx样式"
     }
   ],
@@ -202,92 +208,98 @@
     {
       "id": 2,
       "toolName": "write_file",
-      "confirm": true,
+      "confirm": false,
       "remarks": "写文件"
     },
     {
       "id": 3,
       "toolName": "append_write_file",
-      "confirm": true,
+      "confirm": false,
       "remarks": "追加文件"
     },
     {
       "id": 4,
       "toolName": "read_file",
-      "confirm": true,
+      "confirm": false,
       "remarks": "读取文件"
     },
     {
       "id": 5,
       "toolName": "get_current_datetime",
-      "confirm": true,
+      "confirm": false,
       "remarks": "获取当前时间"
     },
     {
       "id": 6,
       "toolName": "get_current_timestamp",
-      "confirm": true,
+      "confirm": false,
       "remarks": "获取当前时间戳"
     },
     {
       "id": 7,
       "toolName": "create_guid",
-      "confirm": true,
+      "confirm": false,
       "remarks": "创建UUID"
     },
     {
       "id": 8,
       "toolName": "execute_skill_script",
-      "confirm": true,
+      "confirm": false,
       "remarks": "执行技能脚本"
     },
     {
       "id": 9,
       "toolName": "load_skill",
-      "confirm": true,
+      "confirm": false,
       "remarks": "加载技能"
     },
     {
       "id": 10,
       "toolName": "create_sub_agent",
-      "confirm": true,
+      "confirm": false,
       "remarks": "创建智能体"
     },
     {
       "id": 11,
       "toolName": "load_sub_agent",
-      "confirm": true,
+      "confirm": false,
       "remarks": "加载智能体"
     },
     {
       "id": 12,
       "toolName": "wait_for_agents",
-      "confirm": true,
+      "confirm": false,
       "remarks": "等待智能体完成"
     },
     {
       "id": 13,
       "toolName": "add_download_file",
-      "confirm": true,
+      "confirm": false,
       "remarks": "添加到下载文件列表"
     },
     {
       "id": 14,
       "toolName": "reuse_sub_agent",
-      "confirm": true,
+      "confirm": false,
       "remarks": "复用子智能体"
     },
     {
       "id": 15,
       "toolName": "selected",
-      "confirm": true,
+      "confirm": false,
       "remarks": "AI疑问"
     },
     {
       "id": 16,
-      "toolName": "planning",
-      "confirm": true,
-      "remarks": "任务拆解规划."
+      "toolName": "task_planning",
+      "confirm": false,
+      "remarks": "任务规划."
+    },
+    {
+      "id": 17,
+      "toolName": "task_update",
+      "confirm": false,
+      "remarks": "任务更新."
     }
   ],
   "middles": [

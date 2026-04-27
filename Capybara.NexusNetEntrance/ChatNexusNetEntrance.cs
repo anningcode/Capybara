@@ -26,7 +26,7 @@ namespace Capybara.NexusNetEntrance
                 {
                     if (!tcpClientList_.ContainsKey(response.sessionId)) return false;
                     if (!tcpClientList_[response.sessionId].Send(JsonConvert.SerializeObject(response) + "\n")) return false;
-                    if (response.type == 8)
+                    if (response.type == 12)
                     {
                         tcpClientList_[response.sessionId].Stop();
                     }

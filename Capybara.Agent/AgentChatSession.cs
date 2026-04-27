@@ -291,7 +291,7 @@ namespace Capybara.Agent
                         Directory.CreateDirectory(path);
                         if (!Directory.Exists(path)) throw new Exception();
                     }
-                    File.WriteAllText($"{path}/main.json", JsonConvert.SerializeObject(session_));
+                    File.WriteAllText($"{path}main.json", JsonConvert.SerializeObject(session_));
                 }
             }
             catch (Exception ex)
@@ -418,6 +418,64 @@ namespace Capybara.Agent
             }
             catch { }
             return null;
+        }
+        // 保存规划结果
+        public bool SavePlanning(AgentChatPlanningResponseInfo planning)
+        {
+            try
+            {
+                lock (locker_)
+                {
+                    string path = $"capybara/memory/context/{(string.IsNullOrEmpty(session_.parentAgentId) ? session_.agentId : session_.parentAgentId + "/" + session_.agentId)}/";
+                    if (!Directory.Exists(path))
+                    {
+                        Directory.CreateDirectory(path);
+                        if (!Directory.Exists(path)) throw new Exception();
+                    }
+                    File.WriteAllText($"{path}planning.json", JsonConvert.SerializeObject(planning));
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return false;
+            }
+        }
+        // 更新规划结果
+        public AgentChatPlanningResponseInfo? UpdatePlanning(List<(int,string)> status)
+        {
+            try
+            {
+                AgentChatPlanningResponseInfo? result = null;
+                lock (locker_)
+                {
+                    string path = $"capybara/memory/context/{(string.IsNullOrEmpty(session_.parentAgentId) ? session_.agentId : session_.parentAgentId + "/" + session_.agentId)}/planning.json";
+                    if (!File.Exists(path)) throw new Exception();
+                    string json = File.ReadAllText(path);
+                    result = JsonConvert.DeserializeObject<AgentChatPlanningResponseInfo>(json);
+                    if (result == null) throw new Exception();
+
+                    foreach (var item in result.plannings)
+                    {
+                        foreach (var state in status)
+                        {
+                            if (item.id == state.Item1)
+                            {
+                                item.type = state.Item2.ToUpper();
+                            }
+                        }
+                    }
+                    File.WriteAllText(path, JsonConvert.SerializeObject(result));
+                }
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return null;
+            }
         }
     }
 }

@@ -35,11 +35,11 @@ namespace Capybara.entrance
         }
         private void OnRequest(AgentChatMessageInfo request)
         {
-            if (request.type == 0)
+            if (request.type == 0 || request.type == 1 || request.type == 2 || request.type == 3)
             {
                 agentRuntime_.Request(request);
             }
-            Console.WriteLine(JsonConvert.SerializeObject(request));
+            Console.WriteLine("收到:" + JsonConvert.SerializeObject(request));
         }
         private bool OnResponse(AgentChatMessageInfo response)
         {

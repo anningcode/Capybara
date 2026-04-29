@@ -32,7 +32,7 @@ namespace Capybara.Models
     {
         public const int type = 3;
         // 选择列表
-        public List<string> selects { get; set; } = new List<string>();
+        public List<string> options { get; set; } = new List<string>();
     }
     // 响应,收到任务
     public class AgentChatTaskResponseInfo
@@ -203,6 +203,13 @@ namespace Capybara.Models
             }
         }
     }
+    public class AgentChatSelectItemInfo
+    {
+        // true:选择, false:输入
+        public bool type { get; set; }
+        // 选项内容
+        public string content { get; set; } = string.Empty;
+    }
     // 响应,疑问
     public class AgentChatSelectResponseInfo
     {
@@ -210,7 +217,7 @@ namespace Capybara.Models
         // 标题
         public string title { get; set; } = string.Empty;
         // 选项
-        public List<string> selects { get; set; } = new List<string>();
+        public List<AgentChatSelectItemInfo> options { get; set; } = new List<AgentChatSelectItemInfo>();
         // 选择类型:true:单选, false:多选
         public bool single { get; set; } = true;
     }

@@ -158,7 +158,7 @@
     },
     {
       "id": 10,
-      "promptValue": "系统:windows11,工作目录:f:/vcode,所有输出必须按照markdown格式.",
+      "promptValue": "系统:windows11,工作目录:D:/file,所有输出必须按照markdown格式.",
       "remarks": "系统环境"
     },
     {
@@ -285,7 +285,7 @@
     },
     {
       "id": 15,
-      "toolName": "selected",
+      "toolName": "ask_user",
       "confirm": false,
       "remarks": "AI疑问"
     },

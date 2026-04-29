@@ -4,6 +4,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 
 namespace Capybara.Agent
 {
@@ -18,6 +19,7 @@ namespace Capybara.Agent
         {
             onResponse = callback;
         }
+        // 请求
         // 请求
         public void Request(AgentChatMessageInfo request)
         {
@@ -146,9 +148,9 @@ namespace Capybara.Agent
                 OnTaskUpdate(session, context[index].toolCalls.Where(n => n.name == "task_update" && n.response == null).ToList()[0]);
             }
             // 用户选择
-            else if (context[index].role == "assistant" && IsSelected(context[index].toolCalls))
+            else if (context[index].role == "assistant" && IsAskUser(context[index].toolCalls))
             {
-                OnSelected(session, context[index].toolCalls.Where(n => n.name == "selected" && n.response == null).ToList()[0]);
+                OnAskUser(session, context[index].toolCalls.Where(n => n.name == "ask_user" && n.response == null).ToList()[0]);
             }
             // 创建子智能体
             else if (context[index].role == "assistant" && IsCreateSubAgent(context[index].toolCalls))
@@ -348,13 +350,13 @@ namespace Capybara.Agent
             return false;
         }
         // 选择
-        private bool IsSelected(List<AgentLLMItemFuncRequestInfo> toolCalls)
+        private bool IsAskUser(List<AgentLLMItemFuncRequestInfo> toolCalls)
         {
             foreach (var item in toolCalls)
             {
                 if (item.response == null)
                 {
-                    return item.name == "selected";
+                    return item.name == "ask_user";
                 }
             }
             return false;
@@ -417,7 +419,7 @@ namespace Capybara.Agent
                     return item.name != "load_skill" &&
                         item.name != "execute_skill_script" &&
                         item.name != "wait_for_agents" &&
-                        item.name != "selected" &&
+                        item.name != "ask_user" &&
                         item.name != "create_sub_agent" &&
                         item.name != "load_sub_agent" &&
                         item.name != "reuse_sub_agent" &&
@@ -467,7 +469,6 @@ namespace Capybara.Agent
         // 激活父智能体
         private void OnActivateParentAgent(AgentChatSession session)
         {
-            Console.WriteLine("----------------------------------------OnActivateParentAgent----------------------------------------------");
             var sessionParent = session.Complete();
             if (sessionParent == null) return;
 
@@ -522,15 +523,13 @@ namespace Capybara.Agent
         // 等待子智能体
         private void OnWaitForAgent(AgentChatSession session, AgentLLMItemFuncRequestInfo toolCall)
         {
-            Console.WriteLine("----------------------------------------OnWaitForAgent----------------------------------------------");
-
             if (!session.LoadSubAgentAnswers()) return;
 
             session.GetSession().message.type = -1;
             Request(session);
         }
         // AI疑问,列出选项供用户选择解答疑问
-        private void OnSelected(AgentChatSession session, AgentLLMItemFuncRequestInfo toolCall)
+        private void OnAskUser(AgentChatSession session, AgentLLMItemFuncRequestInfo toolCall)
         {
             try
             {
@@ -538,19 +537,37 @@ namespace Capybara.Agent
                 {
                     var json = JObject.Parse(toolCall.arguments);
                     if (json == null) throw new Exception();
-                    if (!json.ContainsKey("list") || !json.ContainsKey("single") || !json.ContainsKey("title")) throw new Exception();
+                    if (!json.ContainsKey("options") || !json.ContainsKey("single") || !json.ContainsKey("title")) throw new Exception();
                     string? title = json["title"]?.ToObject<string>();
-                    List<string>? list = json["list"]?.ToObject<List<string>>();
+                    List<string>? options = json["options"]?.ToObject<List<string>>();
                     bool? single = json["single"]?.ToObject<bool>();
-                    if (title == null || list == null || single == null) throw new Exception();
-                    Response(session, AgentChatSelectResponseInfo.type, new AgentChatSelectResponseInfo { title = title, selects = list, single = (bool)single });
+                    if (title == null || options == null || single == null) throw new Exception();
+
+                    AgentChatSelectResponseInfo param = new AgentChatSelectResponseInfo();
+                    foreach (var item in options)
+                    {
+                        int index = item.IndexOf(':');
+                        if(index == -1) throw new Exception();
+
+                        var key = item.Substring(0, index);
+                        var value = item.Substring(index + 1);
+
+                        AgentChatSelectItemInfo addItem = new AgentChatSelectItemInfo();
+                        addItem.type = key.ToUpper() == "SELECT" ? true : false;
+                        addItem.content = value;
+                        param.options.Add(addItem);
+                    }
+                    param.single = (bool)single;
+                    param.title = title;
+
+                    Response(session, AgentChatSelectResponseInfo.type, param);
                 }
                 else
                 {
                     var value = JsonConvert.DeserializeObject<AgentChatSelectRequestInfo>(session.GetSession().message.data);
                     if (value == null) throw new Exception();
-                    toolCall.response = string.Join('\n', value.selects);
-                    if (value.selects.Count == 0) toolCall.response = "用户没有提供选择!";
+                    toolCall.response = string.Join('\n', value.options);
+                    if (value.options.Count == 0) toolCall.response = "用户没有提供选择!";
                     session.GetSession().message.type = -1;
                     Request(session);
                 }

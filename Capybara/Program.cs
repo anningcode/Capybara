@@ -88,11 +88,20 @@ public class Core
         {
             AgentChatSelectResponseInfo? value = JsonConvert.DeserializeObject<AgentChatSelectResponseInfo>(response.data) ?? new();
             AgentChatSelectRequestInfo param = new AgentChatSelectRequestInfo();
-            param.selects = value.selects;
+            if (value.single)
+            {
+                param.options = new List<string> { value.options[0].content};
+            }
+            else
+            {
+                param.options = value.options.Select(n => n.content).ToList();
+            }
+            
             int result = MessageBox(IntPtr.Zero,
-                                $"标题:{value.title}\n单选:{value.single}\n选择:{string.Join(',', value.selects)}",
+                                $"标题:{value.title}\n单选:{value.single}\n选择:{string.Join(',', param.options)}",
                                 "询问",
                                 MB_YESNO | MB_ICONQUESTION);
+
             AgentChatMessageInfo request = new AgentChatMessageInfo();
 
             request.type = AgentChatSelectRequestInfo.type;
@@ -135,17 +144,17 @@ class Program
         chatEntrance.Init();
         Thread.Sleep(Timeout.Infinite);
         return;
-        // Core core = new Core();
-        // string sessionId = "ff102885-4439-4046-850c-09d3dab4d1ed";
-        // string userId = "c34c9eaf-e9f8-4da7-895e-179f09918391";
-        // AgentChatMessageInfo request = new AgentChatMessageInfo();
-        // request.type = AgentChatQuestionRequestInfo.type;
-        // request.sessionId = sessionId;
-        // request.userId = userId;
-        // // request.data = JsonConvert.SerializeObject(new AgentChatQuestionRequestInfo { content = "帮我用html+css+js写一个坦克大战游戏,将所有文件添加到下载列表." });
-        // // request.data = JsonConvert.SerializeObject(new AgentChatQuestionRequestInfo { content = "帮我看一下几点了?" });
-        // request.data = JsonConvert.SerializeObject(new AgentChatQuestionRequestInfo { content = "帮我创建1个子智能体查看D盘都有哪些文件夹?,保存到markdown文件,并上传到下载列表." });
-        // core.Request(request);
-        // Console.ReadKey();
+        Core core = new Core();
+        string sessionId = "ff102885-4439-4046-850c-09d3dab4d1ed";
+        string userId = "c34c9eaf-e9f8-4da7-895e-179f09918391";
+        AgentChatMessageInfo request = new AgentChatMessageInfo();
+        request.type = AgentChatQuestionRequestInfo.type;
+        request.sessionId = sessionId;
+        request.userId = userId;
+        // request.data = JsonConvert.SerializeObject(new AgentChatQuestionRequestInfo { content = "帮我用html+css+js写一个坦克大战游戏,将所有文件添加到下载列表." });
+        // request.data = JsonConvert.SerializeObject(new AgentChatQuestionRequestInfo { content = "帮我看一下几点了?" });
+        request.data = JsonConvert.SerializeObject(new AgentChatQuestionRequestInfo { content = "帮我张啸武发一封邮件" });
+        core.Request(request);
+        Console.ReadKey();
     }
 }

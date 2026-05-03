@@ -1,4 +1,4 @@
-﻿using Capybara.Agent;
+using Capybara.Agent;
 using Capybara.IEntrance;
 using Capybara.Models;
 using Newtonsoft.Json;
@@ -35,7 +35,7 @@ namespace Capybara.entrance
         }
         private void OnRequest(AgentChatMessageInfo request)
         {
-            if (request.type == 0 || request.type == 1 || request.type == 2 || request.type == 3)
+            if (request.Type == 0 || request.Type == 1 || request.Type == 2 || request.Type == 3)
             {
                 agentRuntime_.Request(request);
             }
@@ -61,13 +61,13 @@ namespace Capybara.entrance
             {
                 try
                 {
-                    Assembly assembly = Assembly.LoadFrom(item.file);
+                    Assembly assembly = Assembly.LoadFrom(item.File);
                     var types = assembly.GetTypes();
                     foreach (var type in types)
                     {
                         if (type.GetInterface(typeof(IChatEntrance).FullName ?? "") != null)
                         {
-                            object? instance = Activator.CreateInstance(type, new object[1] { item.param });
+                            object? instance = Activator.CreateInstance(type, new object[1] { item.Param });
                             if (instance == null) continue;
                             if (instance is IChatEntrance chatEntranceInstance)
                             {
@@ -106,10 +106,10 @@ namespace Capybara.entrance
                     string? remarksValue = entrance.Attribute("remarks")?.Value;
                     moduleFiles.Add(new AgentChatEntranceInfo
                     {
-                        file = fileValue,
-                        param = paramValue,
-                        enable = true,
-                        remarks = remarksValue ?? string.Empty
+                        File = fileValue,
+                        Param = paramValue,
+                        Enable = true,
+                        Remarks = remarksValue ?? string.Empty
                     });
                 }
                 return moduleFiles;

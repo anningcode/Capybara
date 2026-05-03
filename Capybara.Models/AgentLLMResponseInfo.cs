@@ -1,4 +1,5 @@
-﻿using System;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,18 +10,25 @@ namespace Capybara.Models
     public class AgentLLMResponseInfo
     {
         // 思考
-        public string think { get; set; } = string.Empty;
+        [JsonProperty("think")]
+        public string Think { get; set; } = string.Empty;
         // 结论
-        public string answer { get; set; } = string.Empty;
+        [JsonProperty("answer")]
+        public string Answer { get; set; } = string.Empty;
         // 内容
-        public string content { get; set; } = string.Empty;
+        [JsonProperty("content")]
+        public string Content { get; set; } = string.Empty;
         // 消息
-        public string message { get; set; } = "未知异常!";
+        [JsonProperty("message")]
+        public string Message { get; set; } = "未知异常!";
         // 成功
-        public bool success { get; set; } = false;
+        [JsonProperty("success")]
+        public bool Success { get; set; } = false;
         // 停止,输出结束
-        public bool stop { get; set; } = true;
+        [JsonProperty("stop")]
+        public bool Stop { get; set; } = true;
         // 方法
-        public List<AgentLLMItemFuncRequestInfo> toolCalls { get; set; } = new List<AgentLLMItemFuncRequestInfo>();
+        [JsonProperty("toolCalls")]
+        public List<AgentLLMItemFuncRequestInfo> ToolCalls { get; set; } = new List<AgentLLMItemFuncRequestInfo>();
     }
 }

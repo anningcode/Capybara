@@ -27,7 +27,7 @@ namespace Capybara.Agent
         {
             foreach (var item in loadPlugins_)
             {
-                if (item.Contains(tool.name))
+                if (item.Contains(tool.Name))
                 {
                     return item.Invoke(tool);
                 }

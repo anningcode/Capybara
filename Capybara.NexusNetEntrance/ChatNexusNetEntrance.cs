@@ -1,4 +1,4 @@
-﻿using Capybara.IEntrance;
+using Capybara.IEntrance;
 using Capybara.Models;
 using Newtonsoft.Json;
 using NexusNetNetwork;
@@ -24,11 +24,11 @@ namespace Capybara.NexusNetEntrance
             {
                 lock (tcpClientList_)
                 {
-                    if (!tcpClientList_.ContainsKey(response.sessionId)) return false;
-                    if (!tcpClientList_[response.sessionId].Send(JsonConvert.SerializeObject(response) + "\n")) return false;
-                    if (response.type == 12)
+                    if (!tcpClientList_.ContainsKey(response.SessionId)) return false;
+                    if (!tcpClientList_[response.SessionId].Send(JsonConvert.SerializeObject(response) + "\n")) return false;
+                    if (response.Type == 12)
                     {
-                        tcpClientList_[response.sessionId].Stop();
+                        tcpClientList_[response.SessionId].Stop();
                     }
                 }
                 return true;
@@ -57,7 +57,7 @@ namespace Capybara.NexusNetEntrance
             {
                 var chat = JsonConvert.DeserializeObject<AgentChatMessageInfo>(json);
                 if (chat == null) return;
-                ConnectTcpServer(chat.address, chat.sessionId);
+                ConnectTcpServer(chat.Address, chat.SessionId);
                 onRequest?.Invoke(chat);
             }
             catch (Exception ex)

@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,110 +10,163 @@ namespace Capybara.Models
     public class AgentChatUserInfo
     {
         // ID
-        public string id { get; set; } = string.Empty;
+        [JsonProperty("id")]
+        public string Id { get; set; } = string.Empty;
         // 关联智能体ID
-        public int roleId { get; set; }
+        [JsonProperty("roleId")]
+        public int RoleId { get; set; }
         // 名称
-        public string name { get; set; } = string.Empty;
+        [JsonProperty("name")]
+        public string Name { get; set; } = string.Empty;
         // 年龄
-        public int age { get; set; }
+        [JsonProperty("age")]
+        public int Age { get; set; }
         // 性别 1:男,2:女
-        public int sex { get; set; }
+        [JsonProperty("sex")]
+        public int Sex { get; set; }
         // 身高
-        public int height { get; set; }
+        [JsonProperty("height")]
+        public int Height { get; set; }
         // 体重
-        public int weight { get; set; }
+        [JsonProperty("weight")]
+        public int Weight { get; set; }
         // 备注
-        public string remarks { get; set; } = string.Empty;
+        [JsonProperty("remarks")]
+        public string Remarks { get; set; } = string.Empty;
     }
     public class AgentChatRoleInfo
     {
         // ID
-        public int id { get; set; }
+        [JsonProperty("id")]
+        public int Id { get; set; }
         // 名称
-        public string name { get; set; } = string.Empty;
+        [JsonProperty("name")]
+        public string Name { get; set; } = string.Empty;
         // 子智能体ID
-        public List<int> subRoleIds { get; set; } = new List<int>();
+        [JsonProperty("subRoleIds")]
+        public List<int> SubRoleIds { get; set; } = new List<int>();
         // llm地址
-        public string llmAddress { get; set; } = string.Empty;
+        [JsonProperty("llmAddress")]
+        public string LlmAddress { get; set; } = string.Empty;
         // 模型ID
-        public int modelId { get; set; } = 1;
+        [JsonProperty("modelId")]
+        public int ModelId { get; set; } = 1;
         // token大小
-        public int maxTokens { get; set; } = 4096;
+        [JsonProperty("maxTokens")]
+        public int MaxTokens { get; set; } = 4096;
         // 温度
-        public double temperature { get; set; } = 0.7;
+        [JsonProperty("temperature")]
+        public double Temperature { get; set; } = 0.7;
         // 思考
-        public bool thinking { get; set; } = true;
+        [JsonProperty("thinking")]
+        public bool Thinking { get; set; } = true;
         // 提示词列表
-        public List<int> prompts { get; set; } = new List<int>();
+        [JsonProperty("prompts")]
+        public List<int> Prompts { get; set; } = new List<int>();
         // 技能列表
-        public List<int> skills { get; set; } = new List<int>();
+        [JsonProperty("skills")]
+        public List<int> Skills { get; set; } = new List<int>();
         // 工具列表
-        public List<int> tools { get; set; } = new List<int>();
+        [JsonProperty("tools")]
+        public List<int> Tools { get; set; } = new List<int>();
         // 中间件列表
-        public List<int> middles { get; set; } = new List<int>();
+        [JsonProperty("middles")]
+        public List<int> Middles { get; set; } = new List<int>();
         // 备注
-        public string remarks { get; set; } = string.Empty;
+        [JsonProperty("remarks")]
+        public string Remarks { get; set; } = string.Empty;
     }
     public class AgentChatModelInfo
     {
-        public int id { get; set; }
-        public string modelName { get; set; } = string.Empty;
-        public bool isSubAgent { get; set; } = true;
-        public string remarks { get; set; } = string.Empty;
+        [JsonProperty("id")]
+        public int Id { get; set; }
+        [JsonProperty("modelName")]
+        public string ModelName { get; set; } = string.Empty;
+        [JsonProperty("isSubAgent")]
+        public bool IsSubAgent { get; set; } = true;
+        [JsonProperty("remarks")]
+        public string Remarks { get; set; } = string.Empty;
     }
     public class AgentChatPromptInfo
     {
-        public int id { get; set; }
-        public string promptValue { get; set; } = string.Empty;
-        public string remarks { get; set; } = string.Empty;
+        [JsonProperty("id")]
+        public int Id { get; set; }
+        [JsonProperty("promptValue")]
+        public string PromptValue { get; set; } = string.Empty;
+        [JsonProperty("remarks")]
+        public string Remarks { get; set; } = string.Empty;
     }
     public class AgentChatSkillInfo
     {
-        public int id { get; set; }
-        public string skillName { get; set; } = string.Empty;
-        public bool confirm { get; set; }
-        public string remarks { get; set; } = string.Empty;
+        [JsonProperty("id")]
+        public int Id { get; set; }
+        [JsonProperty("skillName")]
+        public string SkillName { get; set; } = string.Empty;
+        [JsonProperty("confirm")]
+        public bool Confirm { get; set; }
+        [JsonProperty("remarks")]
+        public string Remarks { get; set; } = string.Empty;
     }
     public class AgentChatToolInfo
     {
-        public int id { get; set; }
-        public string toolName { get; set; } = string.Empty;
-        public bool confirm { get; set; }
-        public string remarks { get; set; } = string.Empty;
+        [JsonProperty("id")]
+        public int Id { get; set; }
+        [JsonProperty("toolName")]
+        public string ToolName { get; set; } = string.Empty;
+        [JsonProperty("confirm")]
+        public bool Confirm { get; set; }
+        [JsonProperty("remarks")]
+        public string Remarks { get; set; } = string.Empty;
     }
     public class AgentChatMiddleLayerInfo
     {
-        public int id { get; set; }
-        public string middleName { get; set; } = string.Empty;
-        public string remarks { get; set; } = string.Empty;
+        [JsonProperty("id")]
+        public int Id { get; set; }
+        [JsonProperty("middleName")]
+        public string MiddleName { get; set; } = string.Empty;
+        [JsonProperty("remarks")]
+        public string Remarks { get; set; } = string.Empty;
     }
     public class AgentChatConfigInfo
     {
-        public List<AgentChatUserInfo> users { get; set; } = new List<AgentChatUserInfo>();
-        public List<AgentChatRoleInfo> roles { get; set; } = new List<AgentChatRoleInfo>();
-        public List<AgentChatModelInfo> models { get; set; } = new List<AgentChatModelInfo>();
-        public List<AgentChatPromptInfo> prompts { get; set; } = new List<AgentChatPromptInfo>();
-        public List<AgentChatSkillInfo> skills { get; set; } = new List<AgentChatSkillInfo>();
-        public List<AgentChatToolInfo> tools { get; set; } = new List<AgentChatToolInfo>();
-        public List<AgentChatMiddleLayerInfo> middles { get; set; } = new List<AgentChatMiddleLayerInfo>();
+        [JsonProperty("users")]
+        public List<AgentChatUserInfo> Users { get; set; } = new List<AgentChatUserInfo>();
+        [JsonProperty("roles")]
+        public List<AgentChatRoleInfo> Roles { get; set; } = new List<AgentChatRoleInfo>();
+        [JsonProperty("models")]
+        public List<AgentChatModelInfo> Models { get; set; } = new List<AgentChatModelInfo>();
+        [JsonProperty("prompts")]
+        public List<AgentChatPromptInfo> Prompts { get; set; } = new List<AgentChatPromptInfo>();
+        [JsonProperty("skills")]
+        public List<AgentChatSkillInfo> Skills { get; set; } = new List<AgentChatSkillInfo>();
+        [JsonProperty("tools")]
+        public List<AgentChatToolInfo> Tools { get; set; } = new List<AgentChatToolInfo>();
+        [JsonProperty("middles")]
+        public List<AgentChatMiddleLayerInfo> Middles { get; set; } = new List<AgentChatMiddleLayerInfo>();
     }
     public class AgentChatSessionInfo
     {
         // 智能体ID
-        public string agentId { get; set; } = string.Empty;
+        [JsonProperty("agentId")]
+        public string AgentId { get; set; } = string.Empty;
         // 智能体名称
-        public string agentName { get; set; } = string.Empty;
+        [JsonProperty("agentName")]
+        public string AgentName { get; set; } = string.Empty;
         // 父智能体
-        public string parentAgentId { get; set; } = string.Empty;
+        [JsonProperty("parentAgentId")]
+        public string ParentAgentId { get; set; } = string.Empty;
         // 消息ID
-        public string msgId { get; set; } = string.Empty;
+        [JsonProperty("msgId")]
+        public string MsgId { get; set; } = string.Empty;
         // 智能体消息
         [JsonIgnore]
-        public AgentChatMessageInfo message { get; set; } = new AgentChatMessageInfo();
+        [JsonProperty("message")]
+        public AgentChatMessageInfo Message { get; set; } = new AgentChatMessageInfo();
         // 角色信息
-        public AgentChatConfigInfo config { get; set; } = new AgentChatConfigInfo();
+        [JsonProperty("config")]
+        public AgentChatConfigInfo Config { get; set; } = new AgentChatConfigInfo();
         // 上下文
-        public AgentLLMRequestInfo request { get; set; } = new AgentLLMRequestInfo();
+        [JsonProperty("request")]
+        public AgentLLMRequestInfo Request { get; set; } = new AgentLLMRequestInfo();
     }
 }

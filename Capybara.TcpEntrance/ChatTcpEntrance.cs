@@ -1,4 +1,4 @@
-﻿using Capybara.IEntrance;
+using Capybara.IEntrance;
 using Capybara.Models;
 using Newtonsoft.Json;
 using NLog;
@@ -36,10 +36,10 @@ namespace Capybara.TcpEntrance
         {
             try
             {
-                TcpClientNetwork? session = GetSession(response.sessionId);
+                TcpClientNetwork? session = GetSession(response.SessionId);
                 if (session == null) return false;
                 if (!session.Send(JsonConvert.SerializeObject(response) + "\n")) return false;
-                if (response.type == 12)
+                if (response.Type == 12)
                 {
                     session.Stop();
                 }
@@ -63,7 +63,7 @@ namespace Capybara.TcpEntrance
             {
                 var chat = JsonConvert.DeserializeObject<AgentChatMessageInfo>(json);
                 if (chat == null) return;
-                session.SetUserData(chat.sessionId);
+                session.SetUserData(chat.SessionId);
                 onRequest?.Invoke(chat);
             }
             catch (Exception ex)

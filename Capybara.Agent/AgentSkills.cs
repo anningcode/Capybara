@@ -1,4 +1,4 @@
-﻿using Capybara.Models;
+using Capybara.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,7 +20,7 @@ namespace Capybara.Agent
         }
         public List<string> GetSkills(List<AgentChatSkillInfo> skills)
         {
-            return skillsManager_.GetSkills(skills.Select(t => t.skillName).ToList());
+            return skillsManager_.GetSkills(skills.Select(t => t.SkillName).ToList());
         }
     }
 }

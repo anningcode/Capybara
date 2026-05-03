@@ -1,4 +1,4 @@
-﻿using Capybara.Models;
+using Capybara.Models;
 using Newtonsoft.Json.Linq;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
@@ -34,17 +34,17 @@ namespace Capybara.Tool
                 {
                     var attr = item.GetCustomAttribute<AgentFunctionAttribute>();
                     if (attr == null) continue;
-                    if (attr.funcName == tool.name)
+                    if (attr.funcName == tool.Name)
                     {
                         method = item;
                         break;
                     }
                 }
-                if (method == null) return $"方法 {tool.name} 未找到!";
+                if (method == null) return $"方法 {tool.Name} 未找到!";
 
                 var parameters = method.GetParameters();
 
-                var json = JObject.Parse(tool.arguments);
+                var json = JObject.Parse(tool.Arguments);
 
                 if (json == null) throw new Exception();
 
@@ -148,7 +148,7 @@ namespace Capybara.Tool
             }
             catch
             {
-                return $"方法 {tool.name} 调用失败!";
+                return $"方法 {tool.Name} 调用失败!";
             }
         }
         public virtual List<AgentLLMToolCallsRequestInfo> GetTools(List<string> tools)
@@ -181,8 +181,8 @@ namespace Capybara.Tool
 
                     // 构建方法
                     var item = new AgentLLMToolCallsRequestInfo();
-                    item.name = attrFunction.funcName;
-                    item.description = attrDescription.description;
+                    item.Name = attrFunction.funcName;
+                    item.Description = attrDescription.description;
 
                     // 构建参数
                     List<AgentLLMToolCallsArgumentRequestInfo> arguments = new List<AgentLLMToolCallsArgumentRequestInfo>();
@@ -192,12 +192,12 @@ namespace Capybara.Tool
                         if (attr == null || param == null || param.Name == null) continue;
 
                         var argument = new AgentLLMToolCallsArgumentRequestInfo();
-                        argument.name = param.Name;
-                        argument.type = typeMapping.ContainsKey(param.ParameterType) ? typeMapping[param.ParameterType] : throw new Exception("参数类型错误!");
-                        argument.description = attr.description;
+                        argument.Name = param.Name;
+                        argument.Type = typeMapping.ContainsKey(param.ParameterType) ? typeMapping[param.ParameterType] : throw new Exception("参数类型错误!");
+                        argument.Description = attr.description;
                         arguments.Add(argument);
                     }
-                    item.arguments = arguments;
+                    item.Arguments = arguments;
                     result.Add(item);
                 }
                 catch (Exception ex)

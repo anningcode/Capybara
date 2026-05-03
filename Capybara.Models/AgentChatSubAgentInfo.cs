@@ -1,4 +1,5 @@
-﻿using System;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,8 +10,10 @@ namespace Capybara.Models
     public class AgentChatSubAgentInfo
     {
         // 子智能体数量
-        public int count { get; set; } = 0;
+        [JsonProperty("count")]
+        public int Count { get; set; } = 0;
         // 子智能体ID列表
-        public List<string> ids { get; set; } = new List<string>();
+        [JsonProperty("ids")]
+        public List<string> Ids { get; set; } = new List<string>();
     }
 }

@@ -1,4 +1,4 @@
-﻿using Capybara.Models;
+using Capybara.Models;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -80,7 +80,7 @@ namespace Capybara.Agent
                     {
                         break;
                     }
-                    if (json.stop)
+                    if (json.Stop)
                         break;
                 }
             }

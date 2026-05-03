@@ -1,4 +1,5 @@
-﻿using System;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,9 +9,13 @@ namespace Capybara.Models
 {
     public class AgentChatEntranceInfo
     {
-        public string file { get; set; } = string.Empty;
-        public string param { get; set; } = string.Empty;
-        public bool enable { get; set; } = true;
-        public string remarks { get; set; } = string.Empty;
+        [JsonProperty("file")]
+        public string File { get; set; } = string.Empty;
+        [JsonProperty("param")]
+        public string Param { get; set; } = string.Empty;
+        [JsonProperty("enable")]
+        public bool Enable { get; set; } = true;
+        [JsonProperty("remarks")]
+        public string Remarks { get; set; } = string.Empty;
     }
 }

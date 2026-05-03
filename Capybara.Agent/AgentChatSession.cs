@@ -1,4 +1,4 @@
-﻿using Capybara.Models;
+using Capybara.Models;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -26,9 +26,9 @@ namespace Capybara.Agent
         private AgentChatSessionInfo session_ { get; set; } = new();
         public AgentChatSession(AgentChatMessageInfo request)
         {
-            session_.message = request;
-            session_.agentId = request.agentId;
-            session_.parentAgentId = request.parentAgentId;
+            session_.Message = request;
+            session_.AgentId = request.AgentId;
+            session_.ParentAgentId = request.ParentAgentId;
         }
         public AgentChatSession(AgentChatSessionInfo session,bool refactor = true)
         {
@@ -36,34 +36,34 @@ namespace Capybara.Agent
             if (refactor)
             {
                 // 添加工具
-                session_.request.tools = agentTools_.GetTools(session_.config.tools);
+                session_.Request.Tools = agentTools_.GetTools(session_.Config.Tools);
                 // 添加提示词
-                AddPropmtMessage(session_.config.prompts.Select(n => n.promptValue).ToList());
+                AddPropmtMessage(session_.Config.Prompts.Select(n => n.PromptValue).ToList());
                 // 添加技能
-                AddPropmtMessage(agentSkills_.GetSkills(session_.config.skills));
+                AddPropmtMessage(agentSkills_.GetSkills(session_.Config.Skills));
                 // 创建智能体
-                if (session_.config.tools.Where(n => n.toolName == "create_sub_agent").Count() > 0)
+                if (session_.Config.Tools.Where(n => n.ToolName == "create_sub_agent").Count() > 0)
                 {
-                    var models = AgentConfigManager.GetConfig<AgentChatModelInfo>("models", ("isSubAgent", true));
+                    var models = AgentConfigManager.GetConfig<AgentChatModelInfo>("models", ("IsSubAgent", true));
                     string modelPrompts = string.Empty;
                     if (models.Count > 0)
                         modelPrompts = "## 可用模型列表:";
                     foreach (var modelItem in models)
                     {
-                        modelPrompts += $"\n - ID:{modelItem.id},模型名称:{modelItem.modelName},备注:{modelItem.remarks}.";
+                        modelPrompts += $"\n - ID:{modelItem.Id},模型名称:{modelItem.ModelName},备注:{modelItem.Remarks}.";
                     }
                     AddPropmtMessage(modelPrompts);
                 }
                 // 加载智能体
-                if (session_.config.tools.Where(n => n.toolName == "load_sub_agent").Count() > 0)
+                if (session_.Config.Tools.Where(n => n.ToolName == "load_sub_agent").Count() > 0)
                 {
-                    var roles = AgentConfigManager.GetConfig<AgentChatRoleInfo>("roles", ("id", session_.config.roles[0].subRoleIds));
+                    var roles = AgentConfigManager.GetConfig<AgentChatRoleInfo>("roles", ("Id", session_.Config.Roles[0].SubRoleIds));
                     string rolePrompts = string.Empty;
                     if (roles.Count > 0)
                         rolePrompts = "## 可用子智能体:";
                     foreach (var roleItem in roles)
                     {
-                        rolePrompts += $"\n - 角色Id:{roleItem.id},智能体名称:{roleItem.name},备注:{roleItem.remarks}.";
+                        rolePrompts += $"\n - 角色Id:{roleItem.Id},智能体名称:{roleItem.Name},备注:{roleItem.Remarks}.";
                     }
                     AddPropmtMessage(rolePrompts);
                 }
@@ -78,8 +78,8 @@ namespace Capybara.Agent
         {
             var user = agentUser_.GetUser(userId);
             if (user == null) return false;
-            session_.config.users.Add(user);
-            return CreateSession(user.roleId, Guid.NewGuid().ToString());
+            session_.Config.Users.Add(user);
+            return CreateSession(user.RoleId, Guid.NewGuid().ToString());
         }
         // 通过角色ID创建智能体
         public bool CreateSession(int roleId,string agentId)
@@ -91,68 +91,68 @@ namespace Capybara.Agent
                     // 查询角色
                     var role = agentRole_.GetRole(roleId);
                     if (role == null) throw new Exception("角色不存在");
-                    session_.config.roles.Add(role);
+                    session_.Config.Roles.Add(role);
                     // 查询模型
-                    var model = agentModel_.GetModel(role.modelId);
+                    var model = agentModel_.GetModel(role.ModelId);
                     if (model == null) throw new Exception("模型不存在");
-                    session_.config.models.Add(model);
+                    session_.Config.Models.Add(model);
                     // 加载提示词
-                    session_.config.prompts.AddRange(agentPrompt_.GetPrompts(role.prompts));
+                    session_.Config.Prompts.AddRange(agentPrompt_.GetPrompts(role.Prompts));
                     // 加载技能
-                    session_.config.skills.AddRange(agentSkills_.GetSkills(role.skills));
+                    session_.Config.Skills.AddRange(agentSkills_.GetSkills(role.Skills));
                     // 加载工具
-                    session_.config.tools.AddRange(agentTools_.GetTools(role.tools));
+                    session_.Config.Tools.AddRange(agentTools_.GetTools(role.Tools));
                 }
                 // 基础信息
                 {
                     // 智能体ID
-                    session_.agentId = agentId;
+                    session_.AgentId = agentId;
                     // 智能体名称
-                    session_.agentName = session_.config.roles[0].name;
+                    session_.AgentName = session_.Config.Roles[0].Name;
                     // 父智能体
-                    session_.parentAgentId = session_.message.parentAgentId;
+                    session_.ParentAgentId = session_.Message.ParentAgentId;
                 }
                 // 构建上下文
                 {
                     // LLM地址
-                    session_.request.address = session_.config.roles[0].llmAddress;
+                    session_.Request.Address = session_.Config.Roles[0].LlmAddress;
                     // 模型名称
-                    session_.request.model = session_.config.models[0].modelName;
+                    session_.Request.Model = session_.Config.Models[0].ModelName;
                     // 最大token数量
-                    session_.request.maxTokens = session_.config.roles[0].maxTokens;
+                    session_.Request.MaxTokens = session_.Config.Roles[0].MaxTokens;
                     // 温度
-                    session_.request.temperature = session_.config.roles[0].temperature;
+                    session_.Request.Temperature = session_.Config.Roles[0].Temperature;
                     // 开启思考
-                    session_.request.thinking = true;
+                    session_.Request.Thinking = true;
                     // 添加工具
-                    session_.request.tools = agentTools_.GetTools(session_.config.tools);
+                    session_.Request.Tools = agentTools_.GetTools(session_.Config.Tools);
                     // 添加提示词
-                    AddPropmtMessage(session_.config.prompts.Select(n => n.promptValue).ToList());
+                    AddPropmtMessage(session_.Config.Prompts.Select(n => n.PromptValue).ToList());
                     // 添加技能
-                    AddPropmtMessage(agentSkills_.GetSkills(session_.config.skills));
+                    AddPropmtMessage(agentSkills_.GetSkills(session_.Config.Skills));
                     // 创建智能体
-                    if (session_.config.tools.Where(n => n.toolName == "create_sub_agent").Count() > 0)
+                    if (session_.Config.Tools.Where(n => n.ToolName == "create_sub_agent").Count() > 0)
                     {
-                        var models = AgentConfigManager.GetConfig<AgentChatModelInfo>("models", ("isSubAgent", true));
+                        var models = AgentConfigManager.GetConfig<AgentChatModelInfo>("models", ("IsSubAgent", true));
                         string modelPrompts = string.Empty;
                         if (models.Count > 0)
                             modelPrompts = "## 可用模型列表:";
                         foreach (var modelItem in models)
                         {
-                            modelPrompts += $"\n - ID:{modelItem.id},模型名称:{modelItem.modelName},备注:{modelItem.remarks}.";
+                            modelPrompts += $"\n - ID:{modelItem.Id},模型名称:{modelItem.ModelName},备注:{modelItem.Remarks}.";
                         }
                         AddPropmtMessage(modelPrompts);
                     }
                     // 加载智能体
-                    if (session_.config.tools.Where(n => n.toolName == "load_sub_agent").Count() > 0)
+                    if (session_.Config.Tools.Where(n => n.ToolName == "load_sub_agent").Count() > 0)
                     {
-                        var roles = AgentConfigManager.GetConfig<AgentChatRoleInfo>("roles", ("id", session_.config.roles[0].subRoleIds));
+                        var roles = AgentConfigManager.GetConfig<AgentChatRoleInfo>("roles", ("Id", session_.Config.Roles[0].SubRoleIds));
                         string rolePrompts = string.Empty;
                         if (roles.Count > 0)
                             rolePrompts = "## 可用子智能体:";
                         foreach (var roleItem in roles)
                         {
-                            rolePrompts += $"\n - 角色Id:{roleItem.id},智能体名称:{roleItem.name},备注:{roleItem.remarks}.";
+                            rolePrompts += $"\n - 角色Id:{roleItem.Id},智能体名称:{roleItem.Name},备注:{roleItem.Remarks}.";
                         }
                         AddPropmtMessage(rolePrompts);
                     }
@@ -211,13 +211,13 @@ namespace Capybara.Agent
         public bool SetToolResponse(string response)
         {
             bool result = false;
-            if (session_.request.context.Count > 0)
+            if (session_.Request.Context.Count > 0)
             {
-                foreach (var item in session_.request.context[session_.request.context.Count - 1].toolCalls)
+                foreach (var item in session_.Request.Context[session_.Request.Context.Count - 1].ToolCalls)
                 {
-                    if (item.response == null)
+                    if (item.Response == null)
                     {
-                        item.response = response;
+                        item.Response = response;
                         result = true;
                         break;
                     }
@@ -230,33 +230,33 @@ namespace Capybara.Agent
         {
             if (role == "system")
             {
-                for (int i = 0; i < session_.request.context.Count; ++i)
+                for (int i = 0; i < session_.Request.Context.Count; ++i)
                 {
-                    if (session_.request.context.Count > i + 1 && session_.request.context[i].role == "system" && session_.request.context[i + 1].role != "system")
+                    if (session_.Request.Context.Count > i + 1 && session_.Request.Context[i].Role == "system" && session_.Request.Context[i + 1].Role != "system")
                     {
-                        session_.request.context.Insert(i + 1, new AgentLLMItemRequestInfo { role = role, content = content, think = think, answer = answer, toolCalls = toolCalls });
+                        session_.Request.Context.Insert(i + 1, new AgentLLMItemRequestInfo { Role = role, Content = content, Think = think, Answer = answer, ToolCalls = toolCalls });
                         break;
                     }
-                    else if (session_.request.context.Count == i + 1)
+                    else if (session_.Request.Context.Count == i + 1)
                     {
-                        session_.request.context.Add(new AgentLLMItemRequestInfo { role = role, content = content, think = think, answer = answer, toolCalls = toolCalls });
+                        session_.Request.Context.Add(new AgentLLMItemRequestInfo { Role = role, Content = content, Think = think, Answer = answer, ToolCalls = toolCalls });
                         break;
                     }
                 }
-                if (session_.request.context.Count == 0)
+                if (session_.Request.Context.Count == 0)
                 {
-                    session_.request.context.Add(new AgentLLMItemRequestInfo { role = role, content = content, think = think, answer = answer, toolCalls = toolCalls });
+                    session_.Request.Context.Add(new AgentLLMItemRequestInfo { Role = role, Content = content, Think = think, Answer = answer, ToolCalls = toolCalls });
                 }
             }
             else
             {
-                session_.request.context.Add(new AgentLLMItemRequestInfo { role = role, content = content, think = think, answer = answer, toolCalls = toolCalls });
+                session_.Request.Context.Add(new AgentLLMItemRequestInfo { Role = role, Content = content, Think = think, Answer = answer, ToolCalls = toolCalls });
             }
         }
         // 加载session
         public bool LoadSession()
         {
-            return LoadSession(session_.agentId, session_.parentAgentId);
+            return LoadSession(session_.AgentId, session_.ParentAgentId);
         }
         // 加载session
         public bool LoadSession(string agentId,string parentAgentId = "")
@@ -270,7 +270,7 @@ namespace Capybara.Agent
                     string json = File.ReadAllText(path);
                     var session = JsonConvert.DeserializeObject<AgentChatSessionInfo>(json);
                     if (session == null) throw new Exception();
-                    session.message = session_.message;
+                    session.Message = session_.Message;
                     session_ = session;
                     return true;
                 }
@@ -285,7 +285,7 @@ namespace Capybara.Agent
             {
                 lock (locker_)
                 {
-                    string path = $"capybara/memory/context/{(string.IsNullOrEmpty(session_.parentAgentId) ? session_.agentId : session_.parentAgentId + "/" + session_.agentId)}/";
+                    string path = $"capybara/memory/context/{(string.IsNullOrEmpty(session_.ParentAgentId) ? session_.AgentId : session_.ParentAgentId + "/" + session_.AgentId)}/";
                     if (!Directory.Exists(path))
                     {
                         Directory.CreateDirectory(path);
@@ -307,20 +307,20 @@ namespace Capybara.Agent
                 lock (locker_)
                 {
                     List<string> result = new List<string>();
-                    string path = $"capybara/memory/context/{(string.IsNullOrEmpty(session_.parentAgentId) ? session_.agentId : session_.parentAgentId + "/" + session_.agentId)}/subagent.json";
+                    string path = $"capybara/memory/context/{(string.IsNullOrEmpty(session_.ParentAgentId) ? session_.AgentId : session_.ParentAgentId + "/" + session_.AgentId)}/subagent.json";
                     if (!File.Exists(path)) throw new Exception();
                     string json = File.ReadAllText(path);
                     var subAgent = JsonConvert.DeserializeObject<AgentChatSubAgentInfo>(json);
                     if (subAgent == null) throw new Exception();
 
-                    if (subAgent.ids.Count == 0 && subAgent.count == 0)
+                    if (subAgent.Ids.Count == 0 && subAgent.Count == 0)
                     {
                         result.Add("没有发现智能体.");
                     }
-                    else if (subAgent.ids.Count > 0 && subAgent.count == 0)
+                    else if (subAgent.Ids.Count > 0 && subAgent.Count == 0)
                     {
-                        
-                        foreach (var item in subAgent.ids)
+
+                        foreach (var item in subAgent.Ids)
                         {
                             string value = LoadSubAgentAnswer(item);
                             result.Add($"智能体ID:{item}, 结论:{value}");
@@ -328,15 +328,15 @@ namespace Capybara.Agent
                     }
                     if (result.Count > 0)
                     {
-                        var context = session_.request.context;
+                        var context = session_.Request.Context;
                         if (context.Count == 0) return false;
                         int index = context.Count - 1;
 
-                        foreach (var item in context[index].toolCalls)
+                        foreach (var item in context[index].ToolCalls)
                         {
-                            if (item.response == null && item.name == "wait_for_agents")
+                            if (item.Response == null && item.Name == "wait_for_agents")
                             {
-                                item.response = string.Join('\n', result);
+                                item.Response = string.Join('\n', result);
                                 return true;
                             }
                         }
@@ -351,14 +351,14 @@ namespace Capybara.Agent
         {
             try
             {
-                string path = $"capybara/memory/context/{(string.IsNullOrEmpty(session_.parentAgentId) ? session_.agentId : session_.parentAgentId + "/" + session_.agentId)}/{subAgentId}/main.json";
+                string path = $"capybara/memory/context/{(string.IsNullOrEmpty(session_.ParentAgentId) ? session_.AgentId : session_.ParentAgentId + "/" + session_.AgentId)}/{subAgentId}/main.json";
                 if (!File.Exists(path)) throw new Exception();
                 string json = File.ReadAllText(path);
                 var session = JsonConvert.DeserializeObject<AgentChatSessionInfo>(json);
                 if (session == null) throw new Exception();
-                if (session.request.context.Count == 0) throw new Exception();
-                if (session.request.context[session.request.context.Count - 1].role != "assistant") throw new Exception();
-                return session.request.context[session.request.context.Count - 1].answer;
+                if (session.Request.Context.Count == 0) throw new Exception();
+                if (session.Request.Context[session.Request.Context.Count - 1].Role != "assistant") throw new Exception();
+                return session.Request.Context[session.Request.Context.Count - 1].Answer;
             }
             catch {  }
             return string.Empty;
@@ -371,47 +371,47 @@ namespace Capybara.Agent
                 lock (locker_)
                 {
                     AgentChatSubAgentInfo? subAgent = new();
-                    string path = $"capybara/memory/context/{(string.IsNullOrEmpty(session_.parentAgentId) ? session_.agentId : session_.parentAgentId + "/" + session_.agentId)}/subagent.json";
+                    string path = $"capybara/memory/context/{(string.IsNullOrEmpty(session_.ParentAgentId) ? session_.AgentId : session_.ParentAgentId + "/" + session_.AgentId)}/subagent.json";
                     if (File.Exists(path))
                     {
                         string json = File.ReadAllText(path);
                         subAgent = JsonConvert.DeserializeObject<AgentChatSubAgentInfo>(json);
                         if (subAgent == null) throw new Exception();
                     }
-                    subAgent.count++;
-                    subAgent.ids.Add(agentId);
+                    subAgent.Count++;
+                    subAgent.Ids.Add(agentId);
                     File.WriteAllText(path, JsonConvert.SerializeObject(subAgent));
                 }
             }
             catch
-            { 
+            {
             }
         }
         // 子智能体完成
         public AgentChatSession? Complete()
         {
-            if (string.IsNullOrEmpty(session_.parentAgentId)) return null;
+            if (string.IsNullOrEmpty(session_.ParentAgentId)) return null;
             try
             {
                 AgentChatSubAgentInfo? subAgent = new AgentChatSubAgentInfo();
 
                 lock (locker_)
                 {
-                    string path = $"capybara/memory/context/{session_.parentAgentId}/subagent.json";
+                    string path = $"capybara/memory/context/{session_.ParentAgentId}/subagent.json";
                     if (!File.Exists(path)) throw new Exception();
                     string json = File.ReadAllText(path);
                     subAgent = JsonConvert.DeserializeObject<AgentChatSubAgentInfo>(json);
                     if (subAgent == null) throw new Exception();
-                    subAgent.count--;
+                    subAgent.Count--;
                     File.WriteAllText(path, JsonConvert.SerializeObject(subAgent));
                 }
 
-                if (subAgent.count == 0)
+                if (subAgent.Count == 0)
                 {
-                    List<string> paths = session_.parentAgentId.Split('/').ToList();
+                    List<string> paths = session_.ParentAgentId.Split('/').ToList();
                     string agentId = paths[paths.Count - 1];
                     paths.RemoveAt(paths.Count - 1);
-                    AgentChatSession session = new AgentChatSession(new AgentChatMessageInfo { agentId = agentId, parentAgentId = string.Join('/', paths), sessionId = session_.message.sessionId });
+                    AgentChatSession session = new AgentChatSession(new AgentChatMessageInfo { AgentId = agentId, ParentAgentId = string.Join('/', paths), SessionId = session_.Message.SessionId });
                     session.LoadSession();
                     return session;
                 }
@@ -426,7 +426,7 @@ namespace Capybara.Agent
             {
                 lock (locker_)
                 {
-                    string path = $"capybara/memory/context/{(string.IsNullOrEmpty(session_.parentAgentId) ? session_.agentId : session_.parentAgentId + "/" + session_.agentId)}/";
+                    string path = $"capybara/memory/context/{(string.IsNullOrEmpty(session_.ParentAgentId) ? session_.AgentId : session_.ParentAgentId + "/" + session_.AgentId)}/";
                     if (!Directory.Exists(path))
                     {
                         Directory.CreateDirectory(path);
@@ -450,19 +450,19 @@ namespace Capybara.Agent
                 AgentChatPlanningResponseInfo? result = null;
                 lock (locker_)
                 {
-                    string path = $"capybara/memory/context/{(string.IsNullOrEmpty(session_.parentAgentId) ? session_.agentId : session_.parentAgentId + "/" + session_.agentId)}/planning.json";
+                    string path = $"capybara/memory/context/{(string.IsNullOrEmpty(session_.ParentAgentId) ? session_.AgentId : session_.ParentAgentId + "/" + session_.AgentId)}/planning.json";
                     if (!File.Exists(path)) throw new Exception();
                     string json = File.ReadAllText(path);
                     result = JsonConvert.DeserializeObject<AgentChatPlanningResponseInfo>(json);
                     if (result == null) throw new Exception();
 
-                    foreach (var item in result.plannings)
+                    foreach (var item in result.Plannings)
                     {
                         foreach (var state in status)
                         {
-                            if (item.id == state.Item1)
+                            if (item.Id == state.Item1)
                             {
-                                item.type = state.Item2.ToUpper();
+                                item.Type = state.Item2.ToUpper();
                             }
                         }
                     }

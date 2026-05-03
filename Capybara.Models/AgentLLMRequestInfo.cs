@@ -1,4 +1,4 @@
-﻿using Newtonsoft.Json;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,64 +10,86 @@ namespace Capybara.Models
     public class AgentLLMItemFuncRequestInfo
     {
         // 方法名称
-        public string name { get; set; } = string.Empty;
+        [JsonProperty("name")]
+        public string Name { get; set; } = string.Empty;
         // 参数
-        public string arguments { get; set; } = string.Empty;
+        [JsonProperty("arguments")]
+        public string Arguments { get; set; } = string.Empty;
         // 工具响应
-        public string? response { get; set; } = null;
+        [JsonProperty("response")]
+        public string? Response { get; set; } = null;
     };
 
     public class AgentLLMItemRequestInfo
     {
         // 类型 user, assistant, tool
-        public string role { get; set; } = string.Empty;
+        [JsonProperty("role")]
+        public string Role { get; set; } = string.Empty;
         // 思考
-        public string think { get; set; } = string.Empty;
+        [JsonProperty("think")]
+        public string Think { get; set; } = string.Empty;
         // 最终结果
-        public string answer { get; set; } = string.Empty;
+        [JsonProperty("answer")]
+        public string Answer { get; set; } = string.Empty;
         // 内容
-        public string content { get; set; } = string.Empty;
+        [JsonProperty("content")]
+        public string Content { get; set; } = string.Empty;
         // 工具列表
-        public List<AgentLLMItemFuncRequestInfo> toolCalls { get; set; } = new List<AgentLLMItemFuncRequestInfo>();
+        [JsonProperty("toolCalls")]
+        public List<AgentLLMItemFuncRequestInfo> ToolCalls { get; set; } = new List<AgentLLMItemFuncRequestInfo>();
     };
 
     public class AgentLLMToolCallsArgumentRequestInfo
     {
         // 参数名称
-        public string name { get; set; } = string.Empty;
+        [JsonProperty("name")]
+        public string Name { get; set; } = string.Empty;
         // 参数类型
-        public string type { get; set; } = string.Empty;
+        [JsonProperty("type")]
+        public string Type { get; set; } = string.Empty;
         // 描述
-        public string description { get; set; } = string.Empty;
+        [JsonProperty("description")]
+        public string Description { get; set; } = string.Empty;
     };
 
     public class AgentLLMToolCallsRequestInfo
     {
         // 方法名称
-        public string name { get; set; } = string.Empty;
+        [JsonProperty("name")]
+        public string Name { get; set; } = string.Empty;
         // 描述
-        public string description { get; set; } = string.Empty;
+        [JsonProperty("description")]
+        public string Description { get; set; } = string.Empty;
         // 参数列表
-        public List<AgentLLMToolCallsArgumentRequestInfo> arguments { get; set; } = new List<AgentLLMToolCallsArgumentRequestInfo>();
+        [JsonProperty("arguments")]
+        public List<AgentLLMToolCallsArgumentRequestInfo> Arguments { get; set; } = new List<AgentLLMToolCallsArgumentRequestInfo>();
     };
 
     public class AgentLLMRequestInfo
     {
         // apiKey
-        public string apiKey { get; set; } = string.Empty;
+        [JsonProperty("apiKey")]
+        public string ApiKey { get; set; } = string.Empty;
         // 大模型地址
-        public string address { get; set; } = "127.0.0.1:8000";
+        [JsonProperty("address")]
+        public string Address { get; set; } = "127.0.0.1:8000";
         // 请求内容
-        public string model { get; set; } = string.Empty;
+        [JsonProperty("model")]
+        public string Model { get; set; } = string.Empty;
         // 最大token数量
-        public int maxTokens { get; set; } = 4096;
+        [JsonProperty("maxTokens")]
+        public int MaxTokens { get; set; } = 4096;
         // 温度参数
-        public double temperature { get; set; } = 0.7;
+        [JsonProperty("temperature")]
+        public double Temperature { get; set; } = 0.7;
         // 启动思考模式
-        public bool thinking { get; set; } = true;
+        [JsonProperty("thinking")]
+        public bool Thinking { get; set; } = true;
         // 上下文列表
-        public List<AgentLLMItemRequestInfo> context { get; set; } = new List<AgentLLMItemRequestInfo>();
+        [JsonProperty("context")]
+        public List<AgentLLMItemRequestInfo> Context { get; set; } = new List<AgentLLMItemRequestInfo>();
         // 工具列表
-        public List<AgentLLMToolCallsRequestInfo> tools { get; set; } = new List<AgentLLMToolCallsRequestInfo>();
+        [JsonProperty("tools")]
+        public List<AgentLLMToolCallsRequestInfo> Tools { get; set; } = new List<AgentLLMToolCallsRequestInfo>();
     }
 }

@@ -1,4 +1,4 @@
-﻿using Capybara.Models;
+using Capybara.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,8 +19,8 @@ namespace Capybara.Agent
             return AgentConfigManager.GetConfig<AgentChatToolInfo>("tools", ("id", toolIds));
         }
         public List<AgentLLMToolCallsRequestInfo> GetTools(List<AgentChatToolInfo> tools)
-        { 
-            return toolsManager_.GetTools(tools.Select(t => t.toolName).ToList());
+        {
+            return toolsManager_.GetTools(tools.Select(t => t.ToolName).ToList());
         }
     }
 }

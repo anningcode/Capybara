@@ -1,4 +1,4 @@
-﻿using Capybara.Models;
+using Capybara.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,27 +16,27 @@ namespace Capybara.Agent
         {
             response_ = new AgentLLMResponseInfo();
             onResponse = callback;
-            LLMNetworkRequest tcpRequest = new LLMNetworkRequest(request.address, OnResponse);
+            LLMNetworkRequest tcpRequest = new LLMNetworkRequest(request.Address, OnResponse);
             if (!tcpRequest.Request(request))
             {
-                response_.stop = true;
-                response_.success = false;
-                response_.message = "未知异常!";
+                response_.Stop = true;
+                response_.Success = false;
+                response_.Message = "未知异常!";
             }
             tcpRequest.Dispose();
             return response_;
         }
         private bool OnResponse(AgentLLMResponseInfo response)
         {
-            if (response.stop)
+            if (response.Stop)
             {
-                response_.think += response.think;
-                response_.answer += response.answer;
-                response_.content += response.content;
-                response_.message = response.message;
-                response_.success = response.success;
-                response_.stop = response.stop;
-                response_.toolCalls = response.toolCalls;
+                response_.Think += response.Think;
+                response_.Answer += response.Answer;
+                response_.Content += response.Content;
+                response_.Message = response.Message;
+                response_.Success = response.Success;
+                response_.Stop = response.Stop;
+                response_.ToolCalls = response.ToolCalls;
                 return true;
             }
             if (onResponse == null) return false;

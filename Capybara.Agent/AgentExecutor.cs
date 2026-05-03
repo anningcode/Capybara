@@ -1,4 +1,4 @@
-﻿using Capybara.Models;
+using Capybara.Models;
 
 namespace Capybara.Agent
 {
@@ -14,14 +14,14 @@ namespace Capybara.Agent
         // 请求
         public AgentLLMResponseInfo Request()
         {
-            AgentLLMResponseInfo response = new LLMRequest().Request(session_.GetSession().request, OnResponse);
+            AgentLLMResponseInfo response = new LLMRequest().Request(session_.GetSession().Request, OnResponse);
             OnResponse(response);
             return response;
         }
         // llm响应
         private bool OnResponse(AgentLLMResponseInfo response)
         {
-            if (response.stop) return true;
+            if (response.Stop) return true;
             return onResponse.Invoke(response, session_);
         }
     }

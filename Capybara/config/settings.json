@@ -1,7 +1,7 @@
 {
   "users": [
     {
-      "id": "c34c9eaf-e9f8-4da7-895e-179f09918391",
+      "id": "39206f1829e24cc9824b6d0d739ef7e5",
       "roleId": 1,
       "name": "张三",
       "age": 25,
@@ -28,7 +28,7 @@
       "name": "运维经理",
       "subRoleIds": [ 2 ],
       "llmAddress": "127.0.0.1:8899",
-      "modelId": 12,
+      "modelId": 2,
       "maxTokens": 8192,
       "temperature": 0.5,
       "thinking": true,
@@ -65,7 +65,7 @@
     {
       "id": 2,
       "modelName": "qwen3.5-plus",
-      "isSubAgent": false,
+      "isSubAgent": true,
       "remarks": "适用复杂多模态任务"
     },
     {
@@ -168,7 +168,7 @@
     },
     {
       "id": 12,
-      "promptValue": "先规划一下任务,每个细节都要拆分成小任务单元,没调用一次技能或工具都是一个任务,在做实际的事情,按照任务做一个更新一个,开始做之前要把任务更新成执行中让用户知道当前在做什么,把所有生成的文件添加到下载列表.",
+      "promptValue": "用户的所有问题全部要规划,每个细节都要拆分成小任务单元,没调用一次技能或工具都是一个任务,在做实际的事情,按照任务做一个更新一个,开始做之前要把任务更新成执行中让用户知道当前在做什么,把所有生成的文件添加到下载列表.",
       "remarks": "推理限制"
     }
   ],
@@ -176,7 +176,7 @@
     {
       "id": 1,
       "skillName": "email",
-      "confirm": false,
+      "confirm": true,
       "remarks": "邮件"
     },
     {
@@ -202,7 +202,7 @@
     {
       "id": 1,
       "toolName": "bash",
-      "confirm": false,
+      "confirm": true,
       "remarks": "执行终端命令"
     },
     {

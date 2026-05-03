@@ -243,7 +243,7 @@ namespace Capybara.Agent
                         {
                             var value = JsonConvert.DeserializeObject<AgentChatToolConfirmationRequestInfo>(session.GetSession().message.data) ?? new();
                             call.response = value.allow ? toolsManager_.Invoke(call) : "本次用户不允许调用这个工具";
-                            Response(session, AgentChatToolResponseInfo.type, new AgentChatToolResponseInfo { toolName = call.name, response = call.response });
+                            Response(session, AgentChatToolResponseInfo.type, new AgentChatToolResponseInfo { toolName = call.name, response = string.IsNullOrWhiteSpace(call.response) ? "没有内容." : call.response });
                         }
                         else
                         {
@@ -256,7 +256,7 @@ namespace Capybara.Agent
                     {
                         Response(session, AgentChatToolCallResponseInfo.type, new AgentChatToolCallResponseInfo { confirmation = false, toolName = call.name, toolParam = call.arguments });
                         call.response = toolsManager_.Invoke(call);
-                        Response(session, AgentChatToolResponseInfo.type, new AgentChatToolResponseInfo { toolName = call.name, response = call.response });
+                        Response(session, AgentChatToolResponseInfo.type, new AgentChatToolResponseInfo { toolName = call.name, response = string.IsNullOrWhiteSpace(call.response) ? "没有内容." : call.response });
                     }
                     // 执行完成丢给规划方法
                     session.GetSession().message.type = -1;
@@ -309,7 +309,7 @@ namespace Capybara.Agent
                                 {
                                     var value = JsonConvert.DeserializeObject<AgentChatSkillConfirmationRequestInfo>(session.GetSession().message.data) ?? new();
                                     call.response = value.allow ? toolsManager_.Invoke(call) : "本次用户不允许调用这个技能";
-                                    Response(session, AgentChatSkillResponseInfo.type, new AgentChatSkillResponseInfo { skillName = call.name, response = call.response });
+                                    Response(session, AgentChatSkillResponseInfo.type, new AgentChatSkillResponseInfo { skillName = call.name, response = string.IsNullOrWhiteSpace(call.response) ? "没有内容." : call.response });
                                 }
                                 else
                                 {
@@ -322,7 +322,7 @@ namespace Capybara.Agent
                             {
                                 Response(session, AgentChatSkillCallResponseInfo.type, new AgentChatSkillCallResponseInfo { confirmation = false, skillName = call.name, skillParam = call.arguments });
                                 call.response = toolsManager_.Invoke(call);
-                                Response(session, AgentChatSkillResponseInfo.type, new AgentChatSkillResponseInfo { skillName = call.name, response = call.response });
+                                Response(session, AgentChatSkillResponseInfo.type, new AgentChatSkillResponseInfo { skillName = call.name, response = string.IsNullOrWhiteSpace(call.response) ? "没有内容." : call.response });
                             }
                         } 
                         catch 

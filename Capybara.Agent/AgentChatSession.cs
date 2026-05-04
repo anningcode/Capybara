@@ -1,4 +1,6 @@
 using Capybara.Models;
+using Capybara.Utils;
+using LLMGateway.Models;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -17,12 +19,6 @@ namespace Capybara.Agent
     public class AgentChatSession
     {
         private static object locker_ { get; set; } = new object();
-        private AgentUser agentUser_ { get; set; } = new();
-        private AgentRole agentRole_ { get; set; } = new();
-        private AgentModel agentModel_ { get; set; } = new();
-        private AgentTools agentTools_ { get; set; } = new();
-        private AgentSkills agentSkills_ { get; set; } = new();
-        private AgentPrompt agentPrompt_ { get; set; } = new();
         private AgentChatSessionInfo session_ { get; set; } = new();
         public AgentChatSession(AgentChatMessageInfo request)
         {
@@ -36,15 +32,16 @@ namespace Capybara.Agent
             if (refactor)
             {
                 // 添加工具
-                session_.Request.Tools = agentTools_.GetTools(session_.Config.Tools);
+                session_.Request.Tools = AgentAppConfig.GetTools(session_.Config.Tools);
                 // 添加提示词
                 AddPropmtMessage(session_.Config.Prompts.Select(n => n.PromptValue).ToList());
                 // 添加技能
-                AddPropmtMessage(agentSkills_.GetSkills(session_.Config.Skills));
+                AddPropmtMessage(AgentAppConfig.GetSkills(session_.Config.Skills));
                 // 创建智能体
                 if (session_.Config.Tools.Where(n => n.ToolName == "create_sub_agent").Count() > 0)
                 {
-                    var models = AgentConfigManager.GetConfig<AgentChatModelInfo>("models", ("IsSubAgent", true));
+                    var models = AppConfig.Get<List<AgentChatModelInfo>>("models")?.Where(n => n.IsSubAgent).ToList();
+                    if (models == null) models = new();
                     string modelPrompts = string.Empty;
                     if (models.Count > 0)
                         modelPrompts = "## 可用模型列表:";
@@ -57,7 +54,8 @@ namespace Capybara.Agent
                 // 加载智能体
                 if (session_.Config.Tools.Where(n => n.ToolName == "load_sub_agent").Count() > 0)
                 {
-                    var roles = AgentConfigManager.GetConfig<AgentChatRoleInfo>("roles", ("Id", session_.Config.Roles[0].SubRoleIds));
+                    var roles = AppConfig.Get<List<AgentChatRoleInfo>>("roles")?.Where(n => session_.Config.Roles[0].SubRoleIds.Contains(n.Id)).ToList();
+                    if (roles == null) roles = new();
                     string rolePrompts = string.Empty;
                     if (roles.Count > 0)
                         rolePrompts = "## 可用子智能体:";
@@ -76,7 +74,7 @@ namespace Capybara.Agent
         // 通过用户ID创建智能体
         public bool CreateSession(string userId)
         {
-            var user = agentUser_.GetUser(userId);
+            var user = AgentAppConfig.GetUser(userId);
             if (user == null) return false;
             session_.Config.Users.Add(user);
             return CreateSession(user.RoleId, Guid.NewGuid().ToString());
@@ -89,19 +87,19 @@ namespace Capybara.Agent
                 // 加载配置
                 {
                     // 查询角色
-                    var role = agentRole_.GetRole(roleId);
+                    var role = AgentAppConfig.GetRole(roleId);
                     if (role == null) throw new Exception("角色不存在");
                     session_.Config.Roles.Add(role);
                     // 查询模型
-                    var model = agentModel_.GetModel(role.ModelId);
+                    var model = AgentAppConfig.GetModel(role.ModelId);
                     if (model == null) throw new Exception("模型不存在");
                     session_.Config.Models.Add(model);
                     // 加载提示词
-                    session_.Config.Prompts.AddRange(agentPrompt_.GetPrompts(role.Prompts));
+                    session_.Config.Prompts.AddRange(AgentAppConfig.GetPrompts(role.Prompts));
                     // 加载技能
-                    session_.Config.Skills.AddRange(agentSkills_.GetSkills(role.Skills));
+                    session_.Config.Skills.AddRange(AgentAppConfig.GetSkills(role.Skills));
                     // 加载工具
-                    session_.Config.Tools.AddRange(agentTools_.GetTools(role.Tools));
+                    session_.Config.Tools.AddRange(AgentAppConfig.GetTools(role.Tools));
                 }
                 // 基础信息
                 {
@@ -114,10 +112,8 @@ namespace Capybara.Agent
                 }
                 // 构建上下文
                 {
-                    // LLM地址
-                    session_.Request.Address = session_.Config.Roles[0].LlmAddress;
                     // 模型名称
-                    session_.Request.Model = session_.Config.Models[0].ModelName;
+                    session_.Request.Name = session_.Config.Models[0].ModelName;
                     // 最大token数量
                     session_.Request.MaxTokens = session_.Config.Roles[0].MaxTokens;
                     // 温度
@@ -125,15 +121,16 @@ namespace Capybara.Agent
                     // 开启思考
                     session_.Request.Thinking = true;
                     // 添加工具
-                    session_.Request.Tools = agentTools_.GetTools(session_.Config.Tools);
+                    session_.Request.Tools = AgentAppConfig.GetTools(session_.Config.Tools);
                     // 添加提示词
                     AddPropmtMessage(session_.Config.Prompts.Select(n => n.PromptValue).ToList());
                     // 添加技能
-                    AddPropmtMessage(agentSkills_.GetSkills(session_.Config.Skills));
+                    AddPropmtMessage(AgentAppConfig.GetSkills(session_.Config.Skills));
                     // 创建智能体
                     if (session_.Config.Tools.Where(n => n.ToolName == "create_sub_agent").Count() > 0)
                     {
-                        var models = AgentConfigManager.GetConfig<AgentChatModelInfo>("models", ("IsSubAgent", true));
+                        var models = AppConfig.Get<List<AgentChatModelInfo>>("models")?.Where(n => n.IsSubAgent).ToList();
+                        if (models == null) models = new();
                         string modelPrompts = string.Empty;
                         if (models.Count > 0)
                             modelPrompts = "## 可用模型列表:";
@@ -146,7 +143,8 @@ namespace Capybara.Agent
                     // 加载智能体
                     if (session_.Config.Tools.Where(n => n.ToolName == "load_sub_agent").Count() > 0)
                     {
-                        var roles = AgentConfigManager.GetConfig<AgentChatRoleInfo>("roles", ("Id", session_.Config.Roles[0].SubRoleIds));
+                        var roles = AppConfig.Get<List<AgentChatRoleInfo>>("roles")?.Where(n => session_.Config.Roles[0].SubRoleIds.Contains(n.Id)).ToList();
+                        if(roles == null) roles = new();
                         string rolePrompts = string.Empty;
                         if (roles.Count > 0)
                             rolePrompts = "## 可用子智能体:";
@@ -181,31 +179,31 @@ namespace Capybara.Agent
         public void AddUserMessage(string content)
         {
             if (string.IsNullOrEmpty(content)) return;
-            AddMessage("user", content, "", "", new List<AgentLLMItemFuncRequestInfo>());
+            AddMessage(LLMRole.User, content, "", "", new List<LLMFunctionCallRequestInfo>());
         }
         // 添加提示词
         public void AddPropmtMessage(List<string> contents)
         {
             foreach (var content in contents)
             {
-                AddMessage("system", content, "", "", new List<AgentLLMItemFuncRequestInfo>());
+                AddMessage(LLMRole.System, content, "", "", new List<LLMFunctionCallRequestInfo>());
             }
         }
         // 添加提示词列表
         public void AddPropmtMessage(string content)
         {
             if (string.IsNullOrEmpty(content)) return;
-            AddMessage("system", content, "", "", new List<AgentLLMItemFuncRequestInfo>());
+            AddMessage(LLMRole.System, content, "", "", new List<LLMFunctionCallRequestInfo>());
         }
         // 添加工具信息
         public void AddToolMessage(string content)
         {
-            AddMessage("tool", content, "", "", new List<AgentLLMItemFuncRequestInfo>());
+            AddMessage(LLMRole.Tool, content, "", "", new List<LLMFunctionCallRequestInfo>());
         }
         // 添加AI信息
-        public void AddAssistantMessage(string think, string answer, List<AgentLLMItemFuncRequestInfo> toolCalls)
+        public void AddAssistantMessage(string think, string answer, List<LLMFunctionCallRequestInfo> toolCalls)
         {
-            AddMessage("assistant", "", think, answer, toolCalls);
+            AddMessage(LLMRole.Assistant, "", think, answer, toolCalls);
         }
         // 设置工具响应
         public bool SetToolResponse(string response)
@@ -226,31 +224,31 @@ namespace Capybara.Agent
             return result;
         }
         // 添加信息
-        private void AddMessage(string role, string content, string think, string answer, List<AgentLLMItemFuncRequestInfo> toolCalls)
+        private void AddMessage(LLMRole role, string content, string think, string answer, List<LLMFunctionCallRequestInfo> toolCalls)
         {
-            if (role == "system")
+            if (role == LLMRole.System)
             {
                 for (int i = 0; i < session_.Request.Context.Count; ++i)
                 {
-                    if (session_.Request.Context.Count > i + 1 && session_.Request.Context[i].Role == "system" && session_.Request.Context[i + 1].Role != "system")
+                    if (session_.Request.Context.Count > i + 1 && session_.Request.Context[i].Role == LLMRole.System && session_.Request.Context[i + 1].Role != LLMRole.System)
                     {
-                        session_.Request.Context.Insert(i + 1, new AgentLLMItemRequestInfo { Role = role, Content = content, Think = think, Answer = answer, ToolCalls = toolCalls });
+                        session_.Request.Context.Insert(i + 1, new LLMMessageInfo { Role = role, Content = content, Think = think, Answer = answer, ToolCalls = toolCalls });
                         break;
                     }
                     else if (session_.Request.Context.Count == i + 1)
                     {
-                        session_.Request.Context.Add(new AgentLLMItemRequestInfo { Role = role, Content = content, Think = think, Answer = answer, ToolCalls = toolCalls });
+                        session_.Request.Context.Add(new LLMMessageInfo { Role = role, Content = content, Think = think, Answer = answer, ToolCalls = toolCalls });
                         break;
                     }
                 }
                 if (session_.Request.Context.Count == 0)
                 {
-                    session_.Request.Context.Add(new AgentLLMItemRequestInfo { Role = role, Content = content, Think = think, Answer = answer, ToolCalls = toolCalls });
+                    session_.Request.Context.Add(new LLMMessageInfo { Role = role, Content = content, Think = think, Answer = answer, ToolCalls = toolCalls });
                 }
             }
             else
             {
-                session_.Request.Context.Add(new AgentLLMItemRequestInfo { Role = role, Content = content, Think = think, Answer = answer, ToolCalls = toolCalls });
+                session_.Request.Context.Add(new LLMMessageInfo { Role = role, Content = content, Think = think, Answer = answer, ToolCalls = toolCalls });
             }
         }
         // 加载session
@@ -357,7 +355,7 @@ namespace Capybara.Agent
                 var session = JsonConvert.DeserializeObject<AgentChatSessionInfo>(json);
                 if (session == null) throw new Exception();
                 if (session.Request.Context.Count == 0) throw new Exception();
-                if (session.Request.Context[session.Request.Context.Count - 1].Role != "assistant") throw new Exception();
+                if (session.Request.Context[session.Request.Context.Count - 1].Role != LLMRole.Assistant) throw new Exception();
                 return session.Request.Context[session.Request.Context.Count - 1].Answer;
             }
             catch {  }

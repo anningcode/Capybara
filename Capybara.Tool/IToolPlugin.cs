@@ -1,4 +1,5 @@
 using Capybara.Models;
+using LLMGateway.Models;
 using Newtonsoft.Json.Linq;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
@@ -22,7 +23,7 @@ namespace Capybara.Tool
             }
             return false;
         }
-        public virtual string Invoke(AgentLLMItemFuncRequestInfo tool)
+        public virtual string Invoke(LLMFunctionCallRequestInfo tool)
         {
             try
             {
@@ -151,7 +152,7 @@ namespace Capybara.Tool
                 return $"方法 {tool.Name} 调用失败!";
             }
         }
-        public virtual List<AgentLLMToolCallsRequestInfo> GetTools(List<string> tools)
+        public virtual List<LLMToolDefinitionInfo> GetTools(List<string> tools)
         {
             Dictionary<Type, string> typeMapping = new Dictionary<Type, string>
             {
@@ -163,7 +164,7 @@ namespace Capybara.Tool
                 { typeof(List<string>), "array" }
             };
 
-            List<AgentLLMToolCallsRequestInfo> result = new List<AgentLLMToolCallsRequestInfo>();
+            List<LLMToolDefinitionInfo> result = new List<LLMToolDefinitionInfo>();
 
             var name = this.GetType().Name;
             var methods = this.GetType()
@@ -180,18 +181,18 @@ namespace Capybara.Tool
                     if (!tools.Contains(attrFunction.funcName)) continue;
 
                     // 构建方法
-                    var item = new AgentLLMToolCallsRequestInfo();
+                    var item = new LLMToolDefinitionInfo();
                     item.Name = attrFunction.funcName;
                     item.Description = attrDescription.description;
 
                     // 构建参数
-                    List<AgentLLMToolCallsArgumentRequestInfo> arguments = new List<AgentLLMToolCallsArgumentRequestInfo>();
+                    List<LLMToolDefinitionArgumentInfo> arguments = new List<LLMToolDefinitionArgumentInfo>();
                     foreach (var param in method.GetParameters())
                     {
                         var attr = param.GetCustomAttribute<DescriptionAttribute>();
                         if (attr == null || param == null || param.Name == null) continue;
 
-                        var argument = new AgentLLMToolCallsArgumentRequestInfo();
+                        var argument = new LLMToolDefinitionArgumentInfo();
                         argument.Name = param.Name;
                         argument.Type = typeMapping.ContainsKey(param.ParameterType) ? typeMapping[param.ParameterType] : throw new Exception("参数类型错误!");
                         argument.Description = attr.description;

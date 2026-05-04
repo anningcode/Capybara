@@ -7,13 +7,10 @@ using System.Threading.Tasks;
 
 namespace Capybara.Agent
 {
-    public class AgentSkillsManager
+    public static class AgentSkillsManager
     {
-        private static AgentSkillsManager instance_ = new AgentSkillsManager();
-        public static AgentSkillsManager Instance { get { return instance_; } }
-        private AgentSkillsManager() { }
         // 加载技能列表
-        public List<string> GetSkills(List<string> skills)
+        public static List<string> GetSkills(List<string> skills)
         {
             List<string> result = new List<string>();
             if(!File.Exists("./capybara/skills/SKILL.md")) return new List<string>();
@@ -31,7 +28,7 @@ namespace Capybara.Agent
             return new List<string> { skillDescriptio, "## 技能列表(Skills) \n " + string.Join("\n", result) };
         }
         // 加载技能描述
-        private string GetSkillDescription(string path)
+        private static string GetSkillDescription(string path)
         {
             try
             {
@@ -43,7 +40,7 @@ namespace Capybara.Agent
             }
         }
         // 加载技能详情
-        private string GetSkillDetail(string path)
+        private static string GetSkillDetail(string path)
         {
             try
             {

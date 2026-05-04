@@ -1,3 +1,4 @@
+using LLMGateway.Models;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -45,9 +46,6 @@ namespace Capybara.Models
         // 子智能体ID
         [JsonProperty("subRoleIds")]
         public List<int> SubRoleIds { get; set; } = new List<int>();
-        // llm地址
-        [JsonProperty("llmAddress")]
-        public string LlmAddress { get; set; } = string.Empty;
         // 模型ID
         [JsonProperty("modelId")]
         public int ModelId { get; set; } = 1;
@@ -167,6 +165,6 @@ namespace Capybara.Models
         public AgentChatConfigInfo Config { get; set; } = new AgentChatConfigInfo();
         // 上下文
         [JsonProperty("request")]
-        public AgentLLMRequestInfo Request { get; set; } = new AgentLLMRequestInfo();
+        public LLMChatRequestInfo Request { get; set; } = new LLMChatRequestInfo();
     }
 }

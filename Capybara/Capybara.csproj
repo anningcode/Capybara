@@ -10,7 +10,6 @@
   <ItemGroup>
     <Folder Include="capybara\memory\context\" />
     <Folder Include="capybara\skills\" />
-    <Folder Include="config\" />
   </ItemGroup>
 
   <ItemGroup>
@@ -64,7 +63,7 @@
     <None Update="config\nlog.config">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
-    <None Update="config\settings.json">
+    <None Update="config\appsettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

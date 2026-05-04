@@ -1,5 +1,6 @@
 ﻿using Capybara.Models;
 using Capybara.Tool;
+using LLMGateway.Models;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
@@ -10,20 +11,18 @@ using System.Threading.Tasks;
 
 namespace Capybara.Agent
 {
-    public class AgentToolsManager
+    public static class AgentToolsManager
     {
-        private static AgentToolsManager instance_ = new AgentToolsManager();
-        private List<IToolPlugin> loadPlugins_ = new List<IToolPlugin>();
-        public static AgentToolsManager Instance { get { return instance_; } }
-        private AgentToolsManager()
+        private static List<IToolPlugin> loadPlugins_ = new List<IToolPlugin>();
+        static AgentToolsManager()
         {
             Load();
         }
-        private void Load()
+        private static void Load()
         {
             loadPlugins_ = loadPlugins();
         }
-        public string Invoke(AgentLLMItemFuncRequestInfo tool)
+        public static string Invoke(LLMFunctionCallRequestInfo tool)
         {
             foreach (var item in loadPlugins_)
             {
@@ -34,16 +33,16 @@ namespace Capybara.Agent
             }
             return "未实现这个工具!";
         }
-        public List<AgentLLMToolCallsRequestInfo> GetTools(List<string> tools)
+        public static List<LLMToolDefinitionInfo> GetTools(List<string> tools)
         {
-            List<AgentLLMToolCallsRequestInfo> result = new List<AgentLLMToolCallsRequestInfo>();
+            List<LLMToolDefinitionInfo> result = new List<LLMToolDefinitionInfo>();
             foreach (var item in loadPlugins_)
             {
                 result.AddRange(item.GetTools(tools));
             }
             return result;
         }
-        private List<IToolPlugin> loadPlugins()
+        private static List<IToolPlugin> loadPlugins()
         {
             List<IToolPlugin> result = new List<IToolPlugin>();
             string folderPath = "./plugins";
@@ -56,23 +55,28 @@ namespace Capybara.Agent
 
             return result;
         }
-        private List<IToolPlugin> loadPlugins(string assemblyPath)
+        private static List<IToolPlugin> loadPlugins(string assemblyPath)
         {
-            List<IToolPlugin> result = new List<IToolPlugin>();
-            Assembly assembly = Assembly.LoadFrom(assemblyPath);
-            var types = assembly.GetTypes();
-            foreach (var type in types)
+            try 
             {
-                if (type.IsSubclassOf(typeof(IToolPlugin)))
+                List<IToolPlugin> result = new List<IToolPlugin>();
+                Assembly assembly = Assembly.LoadFrom(assemblyPath);
+                var types = assembly.GetTypes();
+                foreach (var type in types)
                 {
-                    object? instance = Activator.CreateInstance(type);
-                    if (instance is IToolPlugin pluginInstance)
+                    if (type.IsSubclassOf(typeof(IToolPlugin)))
                     {
-                        result.Add(pluginInstance);
+                        object? instance = Activator.CreateInstance(type);
+                        if (instance is IToolPlugin pluginInstance)
+                        {
+                            result.Add(pluginInstance);
+                        }
                     }
                 }
+                return result;
             }
-            return result;
+            catch { return new(); }
+            
         }
     }
 }

@@ -1,4 +1,5 @@
 using Capybara.Models;
+using LLMGateway.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -10,8 +11,6 @@ namespace Capybara.Agent
 {
     public class AgentRuntime
     {
-        // 工具
-        private AgentToolsManager toolsManager_ { get; set; } = AgentToolsManager.Instance;
         // 响应回调
         public Func<AgentChatMessageInfo, bool> onResponse { get; set; }
         // 构造
@@ -128,62 +127,62 @@ namespace Capybara.Agent
             int index = context.Count - 1;
 
             // 用户询问
-            if (context[index].Role == "user")
+            if (context[index].Role == LLMRole.User)
             {
                 ExecuteQuestion(session);
             }
             // 上传文件
-            else if (context[index].Role == "assistant" && IsDownloadFile(context[index].ToolCalls))
+            else if (context[index].Role == LLMRole.Assistant && IsDownloadFile(context[index].ToolCalls))
             {
                 OnDownloadFile(session, context[index].ToolCalls.Where(n => n.Name == "add_download_file" && n.Response == null).ToList()[0]);
             }
             // 规划任务
-            else if (context[index].Role == "assistant" && IsTaskPlanning(context[index].ToolCalls))
+            else if (context[index].Role == LLMRole.Assistant && IsTaskPlanning(context[index].ToolCalls))
             {
                 OnTaskPlanning(session, context[index].ToolCalls.Where(n => n.Name == "task_planning" && n.Response == null).ToList()[0]);
             }
             // 更新任务
-            else if (context[index].Role == "assistant" && IsTaskUpdate(context[index].ToolCalls))
+            else if (context[index].Role == LLMRole.Assistant && IsTaskUpdate(context[index].ToolCalls))
             {
                 OnTaskUpdate(session, context[index].ToolCalls.Where(n => n.Name == "task_update" && n.Response == null).ToList()[0]);
             }
             // 用户选择
-            else if (context[index].Role == "assistant" && IsAskUser(context[index].ToolCalls))
+            else if (context[index].Role == LLMRole.Assistant && IsAskUser(context[index].ToolCalls))
             {
                 OnAskUser(session, context[index].ToolCalls.Where(n => n.Name == "ask_user" && n.Response == null).ToList()[0]);
             }
             // 创建子智能体
-            else if (context[index].Role == "assistant" && IsCreateSubAgent(context[index].ToolCalls))
+            else if (context[index].Role == LLMRole.Assistant && IsCreateSubAgent(context[index].ToolCalls))
             {
                 OnCreateSubAgent(session, context[index].ToolCalls.Where(n => n.Name == "create_sub_agent" && n.Response == null).ToList()[0]);
             }
             // 加载子智能体
-            else if (context[index].Role == "assistant" && IsLoadSubAgent(context[index].ToolCalls))
+            else if (context[index].Role == LLMRole.Assistant && IsLoadSubAgent(context[index].ToolCalls))
             {
                 OnLoadSubAgent(session, context[index].ToolCalls.Where(n => n.Name == "load_sub_agent" && n.Response == null).ToList()[0]);
             }
             // 复用子智能体
-            else if (context[index].Role == "assistant" && IsReuseSubAgent(context[index].ToolCalls))
+            else if (context[index].Role == LLMRole.Assistant && IsReuseSubAgent(context[index].ToolCalls))
             {
                 OnReuseSubAgent(session, context[index].ToolCalls.Where(n => n.Name == "reuse_sub_agent" && n.Response == null).ToList()[0]);
             }
             // 等待子智能体
-            else if (context[index].Role == "assistant" && IsWaitForAgent(context[index].ToolCalls))
+            else if (context[index].Role == LLMRole.Assistant && IsWaitForAgent(context[index].ToolCalls))
             {
                 OnWaitForAgent(session, context[index].ToolCalls.Where(n => n.Name == "wait_for_agents" && n.Response == null).ToList()[0]);
             }
             // 工具调用
-            else if (context[index].Role == "assistant" && IsTools(context[index].ToolCalls))
+            else if (context[index].Role == LLMRole.Assistant && IsTools(context[index].ToolCalls))
             {
                 ExecuteTools(session);
             }
             // 技能调用
-            else if (context[index].Role == "assistant" && IsSkills(context[index].ToolCalls))
+            else if (context[index].Role == LLMRole.Assistant && IsSkills(context[index].ToolCalls))
             {
                 ExecuteSkills(session);
             }
             // 工具执行完成提交给大模型继续执行
-            else if (context[index].Role == "assistant" && context[index].ToolCalls.Count > 0)
+            else if (context[index].Role == LLMRole.Assistant && context[index].ToolCalls.Count > 0)
             {
                 ExecuteQuestion(session);
             }
@@ -242,7 +241,7 @@ namespace Capybara.Agent
                         if (session.GetSession().Message.Type == AgentChatToolConfirmationRequestInfo.Type)
                         {
                             var value = JsonConvert.DeserializeObject<AgentChatToolConfirmationRequestInfo>(session.GetSession().Message.Data) ?? new();
-                            call.Response = value.Allow ? toolsManager_.Invoke(call) : "本次用户不允许调用这个工具";
+                            call.Response = value.Allow ? AgentToolsManager.Invoke(call) : "本次用户不允许调用这个工具";
                             Response(session, AgentChatToolResponseInfo.Type, new AgentChatToolResponseInfo { ToolName = call.Name, Response = string.IsNullOrWhiteSpace(call.Response) ? "没有内容." : call.Response });
                         }
                         else
@@ -255,7 +254,7 @@ namespace Capybara.Agent
                     else
                     {
                         Response(session, AgentChatToolCallResponseInfo.Type, new AgentChatToolCallResponseInfo { Confirmation = false, ToolName = call.Name, ToolParam = call.Arguments });
-                        call.Response = toolsManager_.Invoke(call);
+                        call.Response = AgentToolsManager.Invoke(call);
                         Response(session, AgentChatToolResponseInfo.Type, new AgentChatToolResponseInfo { ToolName = call.Name, Response = string.IsNullOrWhiteSpace(call.Response) ? "没有内容." : call.Response });
                     }
                     // 执行完成丢给规划方法
@@ -308,7 +307,7 @@ namespace Capybara.Agent
                                 if (session.GetSession().Message.Type == AgentChatSkillConfirmationRequestInfo.Type)
                                 {
                                     var value = JsonConvert.DeserializeObject<AgentChatSkillConfirmationRequestInfo>(session.GetSession().Message.Data) ?? new();
-                                    call.Response = value.Allow ? toolsManager_.Invoke(call) : "本次用户不允许调用这个技能";
+                                    call.Response = value.Allow ? AgentToolsManager.Invoke(call) : "本次用户不允许调用这个技能";
                                     Response(session, AgentChatSkillResponseInfo.Type, new AgentChatSkillResponseInfo { SkillName = call.Name, Response = string.IsNullOrWhiteSpace(call.Response) ? "没有内容." : call.Response });
                                 }
                                 else
@@ -321,7 +320,7 @@ namespace Capybara.Agent
                             else
                             {
                                 Response(session, AgentChatSkillCallResponseInfo.Type, new AgentChatSkillCallResponseInfo { Confirmation = false, SkillName = call.Name, SkillParam = call.Arguments });
-                                call.Response = toolsManager_.Invoke(call);
+                                call.Response = AgentToolsManager.Invoke(call);
                                 Response(session, AgentChatSkillResponseInfo.Type, new AgentChatSkillResponseInfo { SkillName = call.Name, Response = string.IsNullOrWhiteSpace(call.Response) ? "没有内容." : call.Response });
                             }
                         }
@@ -338,7 +337,7 @@ namespace Capybara.Agent
             }
         }
         // 文件上传
-        private bool IsDownloadFile(List<AgentLLMItemFuncRequestInfo> toolCalls)
+        private bool IsDownloadFile(List<LLMFunctionCallRequestInfo> toolCalls)
         {
             foreach (var item in toolCalls)
             {
@@ -350,7 +349,7 @@ namespace Capybara.Agent
             return false;
         }
         // 选择
-        private bool IsAskUser(List<AgentLLMItemFuncRequestInfo> toolCalls)
+        private bool IsAskUser(List<LLMFunctionCallRequestInfo> toolCalls)
         {
             foreach (var item in toolCalls)
             {
@@ -362,7 +361,7 @@ namespace Capybara.Agent
             return false;
         }
         // 创建智能体
-        private bool IsCreateSubAgent(List<AgentLLMItemFuncRequestInfo> toolCalls)
+        private bool IsCreateSubAgent(List<LLMFunctionCallRequestInfo> toolCalls)
         {
             foreach (var item in toolCalls)
             {
@@ -374,7 +373,7 @@ namespace Capybara.Agent
             return false;
         }
         // 加载智能体
-        private bool IsLoadSubAgent(List<AgentLLMItemFuncRequestInfo> toolCalls)
+        private bool IsLoadSubAgent(List<LLMFunctionCallRequestInfo> toolCalls)
         {
             foreach (var item in toolCalls)
             {
@@ -386,7 +385,7 @@ namespace Capybara.Agent
             return false;
         }
         // 复用智能体
-        private bool IsReuseSubAgent(List<AgentLLMItemFuncRequestInfo> toolCalls)
+        private bool IsReuseSubAgent(List<LLMFunctionCallRequestInfo> toolCalls)
         {
             foreach (var item in toolCalls)
             {
@@ -398,7 +397,7 @@ namespace Capybara.Agent
             return false;
         }
         // 等待子智能体
-        private bool IsWaitForAgent(List<AgentLLMItemFuncRequestInfo> toolCalls)
+        private bool IsWaitForAgent(List<LLMFunctionCallRequestInfo> toolCalls)
         {
             foreach (var item in toolCalls)
             {
@@ -410,7 +409,7 @@ namespace Capybara.Agent
             return false;
         }
         // 判断是不是调用工具
-        private bool IsTools(List<AgentLLMItemFuncRequestInfo> toolCalls)
+        private bool IsTools(List<LLMFunctionCallRequestInfo> toolCalls)
         {
             foreach (var item in toolCalls)
             {
@@ -431,7 +430,7 @@ namespace Capybara.Agent
             return false;
         }
         // 判断是不是调用技能
-        private bool IsSkills(List<AgentLLMItemFuncRequestInfo> toolCalls)
+        private bool IsSkills(List<LLMFunctionCallRequestInfo> toolCalls)
         {
             foreach (var item in toolCalls)
             {
@@ -443,7 +442,7 @@ namespace Capybara.Agent
             return false;
         }
         // 判断是不是规划
-        private bool IsTaskPlanning(List<AgentLLMItemFuncRequestInfo> toolCalls)
+        private bool IsTaskPlanning(List<LLMFunctionCallRequestInfo> toolCalls)
         {
             foreach (var item in toolCalls)
             {
@@ -455,7 +454,7 @@ namespace Capybara.Agent
             return false;
         }
         // 判断是不是更新任务
-        private bool IsTaskUpdate(List<AgentLLMItemFuncRequestInfo> toolCalls)
+        private bool IsTaskUpdate(List<LLMFunctionCallRequestInfo> toolCalls)
         {
             foreach (var item in toolCalls)
             {
@@ -486,7 +485,7 @@ namespace Capybara.Agent
             catch { }
         }
         // 添加到下载列表
-        private void OnDownloadFile(AgentChatSession session, AgentLLMItemFuncRequestInfo toolCall)
+        private void OnDownloadFile(AgentChatSession session, LLMFunctionCallRequestInfo toolCall)
         {
             try
             {
@@ -521,7 +520,7 @@ namespace Capybara.Agent
             }
         }
         // 等待子智能体
-        private void OnWaitForAgent(AgentChatSession session, AgentLLMItemFuncRequestInfo toolCall)
+        private void OnWaitForAgent(AgentChatSession session, LLMFunctionCallRequestInfo toolCall)
         {
             if (!session.LoadSubAgentAnswers()) return;
 
@@ -529,7 +528,7 @@ namespace Capybara.Agent
             Request(session);
         }
         // AI疑问,列出选项供用户解答疑问
-        private void OnAskUser(AgentChatSession session, AgentLLMItemFuncRequestInfo toolCall)
+        private void OnAskUser(AgentChatSession session, LLMFunctionCallRequestInfo toolCall)
         {
             try
             {
@@ -580,7 +579,7 @@ namespace Capybara.Agent
             }
         }
         // 智能体规划任务
-        private void OnTaskPlanning(AgentChatSession session, AgentLLMItemFuncRequestInfo toolCall)
+        private void OnTaskPlanning(AgentChatSession session, LLMFunctionCallRequestInfo toolCall)
         {
             try
             {
@@ -621,7 +620,7 @@ namespace Capybara.Agent
             }
         }
         // 智能体更新任务
-        private void OnTaskUpdate(AgentChatSession session, AgentLLMItemFuncRequestInfo toolCall)
+        private void OnTaskUpdate(AgentChatSession session, LLMFunctionCallRequestInfo toolCall)
         {
             try
             {
@@ -658,7 +657,7 @@ namespace Capybara.Agent
             }
         }
         // 创建子智能体
-        private void OnCreateSubAgent(AgentChatSession session, AgentLLMItemFuncRequestInfo toolCall)
+        private void OnCreateSubAgent(AgentChatSession session, LLMFunctionCallRequestInfo toolCall)
         {
             try
             {
@@ -727,16 +726,16 @@ namespace Capybara.Agent
                 AgentChatConfigInfo config = new AgentChatConfigInfo
                 {
                     Users = new List<AgentChatUserInfo> { },
-                    Roles = new List<AgentChatRoleInfo> { { new AgentChatRoleInfo { Name = agentName, LlmAddress = session.GetSession().Config.Roles[0].LlmAddress, Temperature = (double)temperature, MaxTokens = (int)maxTokens } } },
+                    Roles = new List<AgentChatRoleInfo> { { new AgentChatRoleInfo { Name = agentName, Temperature = (double)temperature, MaxTokens = (int)maxTokens } } },
                     Models = new List<AgentChatModelInfo> { { new AgentChatModelInfo { ModelName = model } } },
                     Prompts = new List<AgentChatPromptInfo> { { new AgentChatPromptInfo { PromptValue = prompt } } },
                     Skills = skillsValue,
                     Tools = toolsValue
                 };
                 // 上下文
-                AgentLLMRequestInfo request = new AgentLLMRequestInfo();
+                LLMChatRequestInfo request = new LLMChatRequestInfo();
                 // LLM地址
-                request.Address = session.GetSession().Config.Roles[0].LlmAddress;
+                //request.Address = session.GetSession().Config.Roles[0].LlmAddress;
                 // 模型名称
                 request.Model = session.GetSession().Config.Models[0].ModelName;
                 // 最大token数量
@@ -748,17 +747,17 @@ namespace Capybara.Agent
                 // 添加提示词
                 if (!string.IsNullOrEmpty(prompt))
                 {
-                    request.Context.Add(new AgentLLMItemRequestInfo
+                    request.Context.Add(new LLMMessageInfo
                     {
                         Content = prompt,
-                        Role = "system"
+                        Role = LLMRole.System
                     });
                 }
                 // 添加问题
-                request.Context.Add(new AgentLLMItemRequestInfo
+                request.Context.Add(new LLMMessageInfo
                 {
                     Content = content,
-                    Role = "user"
+                    Role = LLMRole.User
                 });
                 // 参数
                 AgentChatSessionInfo param = new AgentChatSessionInfo
@@ -791,7 +790,7 @@ namespace Capybara.Agent
             }
         }
         // 加载子智能体
-        private void OnLoadSubAgent(AgentChatSession session, AgentLLMItemFuncRequestInfo toolCall)
+        private void OnLoadSubAgent(AgentChatSession session, LLMFunctionCallRequestInfo toolCall)
         {
             try
             {
@@ -836,7 +835,7 @@ namespace Capybara.Agent
             }
         }
         // 复用子智能体
-        private void OnReuseSubAgent(AgentChatSession session, AgentLLMItemFuncRequestInfo toolCall)
+        private void OnReuseSubAgent(AgentChatSession session, LLMFunctionCallRequestInfo toolCall)
         {
             try
             {
@@ -879,7 +878,7 @@ namespace Capybara.Agent
             }
         }
         // 响应
-        private bool OnResponse(AgentLLMResponseInfo response, AgentChatSession session)
+        private bool OnResponse(LLMChatResponseInfo response, AgentChatSession session)
         {
             if (!string.IsNullOrEmpty(response.Think))
             {

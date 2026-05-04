@@ -7,9 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Capybara.LLM\Capybara.LLM.csproj" />
     <ProjectReference Include="..\Capybara.Models\Capybara.Models.csproj" />
-    <ProjectReference Include="..\Capybara.Tool\Capybara.Tool.csproj" />
     <ProjectReference Include="..\Capybara.Utils\Capybara.Utils.csproj" />
   </ItemGroup>
 

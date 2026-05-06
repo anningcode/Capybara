@@ -28,12 +28,7 @@ namespace Capybara.Service
         public bool Insert(AgentChatPromptInfo value)
         {
             var values = AppConfig.Get<List<AgentChatPromptInfo>>("prompts") ?? new();
-            int id = 1;
-            if (values.Count > 0)
-            {
-                id = values[values.Count - 1].Id + 1;
-            }
-            value.Id = id;
+            value.Id = CommonHelper.FindSmallestMissingPositive(values.Select(n => n.Id).ToList());
             values.Add(value);
             AppConfig.Set("prompts", values);
             return true;

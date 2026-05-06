@@ -27,12 +27,7 @@ namespace Capybara.Service
         public bool Insert(AgentChatModelInfo value)
         {
             var values = AppConfig.Get<List<AgentChatModelInfo>>("models") ?? new();
-            int id = 1;
-            if (values.Count > 0)
-            {
-                id = values[values.Count - 1].Id + 1;
-            }
-            value.Id = id;
+            value.Id = CommonHelper.FindSmallestMissingPositive(values.Select(n => n.Id).ToList());
             values.Add(value);
             AppConfig.Set("models", values);
             return true;

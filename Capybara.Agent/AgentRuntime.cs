@@ -1,4 +1,5 @@
 using Capybara.Models;
+using Capybara.Utils;
 using LLMGateway.Models;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -11,11 +12,15 @@ namespace Capybara.Agent
 {
     public class AgentRuntime
     {
+        private string rootPath_ { get; set; } = "D:/file/";
         // 响应回调
         public Func<AgentChatMessageInfo, bool> onResponse { get; set; }
         // 构造
         public AgentRuntime(Func<AgentChatMessageInfo, bool> callback)
         {
+            var values = AppConfig.Get<List<WebGeneralConfigInfo>>("generals");
+            if (values != null)
+                rootPath_ = values.FirstOrDefault(n => n.Key == "rootpath" && n.Enable)?.Value ?? rootPath_;
             onResponse = callback;
         }
         // 请求
@@ -494,6 +499,8 @@ namespace Capybara.Agent
                 if (!json.ContainsKey("path")) throw new Exception();
                 string? path = json["path"]?.ToObject<string>();
                 if (path == null) throw new Exception();
+
+                path = Path.Join(rootPath_, path);
 
                 if (File.Exists(path))
                 {

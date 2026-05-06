@@ -34,5 +34,34 @@ namespace Capybara.Utils
 
             return default;
         }
+
+        public static bool Set<T>(string key, T value)
+        {
+            try
+            {
+                var path = GetFilePath();
+                JObject root;
+
+                if (File.Exists(path))
+                {
+                    root = JObject.Parse(File.ReadAllText(path));
+                }
+                else
+                {
+                    var dir = Path.GetDirectoryName(path);
+                    if (!string.IsNullOrEmpty(dir) && !Directory.Exists(dir))
+                        Directory.CreateDirectory(dir);
+                    root = [];
+                }
+
+                root[key] = value != null ? JToken.FromObject(value) : JValue.CreateNull();
+                File.WriteAllText(path, root.ToString(Formatting.Indented));
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
     }
 }

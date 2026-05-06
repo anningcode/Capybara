@@ -31,6 +31,9 @@ namespace Capybara.Models
         // 体重
         [JsonProperty("weight")]
         public int Weight { get; set; }
+        // 启用
+        [JsonProperty("enable")]
+        public bool Enable { get; set; }
         // 备注
         [JsonProperty("remarks")]
         public string Remarks { get; set; } = string.Empty;
@@ -70,6 +73,9 @@ namespace Capybara.Models
         // 中间件列表
         [JsonProperty("middles")]
         public List<int> Middles { get; set; } = new List<int>();
+        // 启用
+        [JsonProperty("enable")]
+        public bool Enable { get; set; }
         // 备注
         [JsonProperty("remarks")]
         public string Remarks { get; set; } = string.Empty;
@@ -82,6 +88,9 @@ namespace Capybara.Models
         public string ModelName { get; set; } = string.Empty;
         [JsonProperty("isSubAgent")]
         public bool IsSubAgent { get; set; } = true;
+        // 启用
+        [JsonProperty("enable")]
+        public bool Enable { get; set; }
         [JsonProperty("remarks")]
         public string Remarks { get; set; } = string.Empty;
     }
@@ -91,6 +100,9 @@ namespace Capybara.Models
         public int Id { get; set; }
         [JsonProperty("promptValue")]
         public string PromptValue { get; set; } = string.Empty;
+        // 启用
+        [JsonProperty("enable")]
+        public bool Enable { get; set; }
         [JsonProperty("remarks")]
         public string Remarks { get; set; } = string.Empty;
     }
@@ -102,6 +114,9 @@ namespace Capybara.Models
         public string SkillName { get; set; } = string.Empty;
         [JsonProperty("confirm")]
         public bool Confirm { get; set; }
+        // 启用
+        [JsonProperty("enable")]
+        public bool Enable { get; set; }
         [JsonProperty("remarks")]
         public string Remarks { get; set; } = string.Empty;
     }
@@ -113,6 +128,9 @@ namespace Capybara.Models
         public string ToolName { get; set; } = string.Empty;
         [JsonProperty("confirm")]
         public bool Confirm { get; set; }
+        // 启用
+        [JsonProperty("enable")]
+        public bool Enable { get; set; }
         [JsonProperty("remarks")]
         public string Remarks { get; set; } = string.Empty;
     }
@@ -122,6 +140,9 @@ namespace Capybara.Models
         public int Id { get; set; }
         [JsonProperty("middleName")]
         public string MiddleName { get; set; } = string.Empty;
+        // 启用
+        [JsonProperty("enable")]
+        public bool Enable { get; set; }
         [JsonProperty("remarks")]
         public string Remarks { get; set; } = string.Empty;
     }

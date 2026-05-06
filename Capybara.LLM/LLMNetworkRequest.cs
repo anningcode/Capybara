@@ -17,11 +17,15 @@ namespace Capybara.LLM
             bool result = _client.Start(url).Result;
             return result;
         }
-        public LLMChatResponseInfo Request(string appKey, LLMChatRequestInfo request, Func<LLMChatResponseInfo, bool> callback)
+        public LLMChatResponseInfo Request(string url, LLMChatRequestInfo request, Func<LLMChatResponseInfo, bool> callback)
         {
             try
             {
-                if (!Start(appKey)) throw new Exception("连接websocket失败!");
+                if (!Start(url)) 
+                {
+                    _client.Stop().Wait();
+                    throw new Exception("连接websocket失败!");
+                }
                 _client.Send(JsonConvert.SerializeObject(request)).Wait();
                 Receive(callback).Wait();
                 _client.Stop().Wait();

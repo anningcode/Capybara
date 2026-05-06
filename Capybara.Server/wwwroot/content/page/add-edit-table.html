@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>layui</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="/content/lib/layui-v2.9.18/css/layui.css" media="all">
+    <link rel="stylesheet" href="/content/css/public.css" media="all">
+</head>
+<body>
+<div class="layuimini-container">
+    <div class="layuimini-main">
+        <button type="button" class="layui-btn" id="get_table_param">获取表格参数</button>
+        <table class="layui-hide" id="currentTableId" lay-filter="currentTableFilter"></table>
+    </div>
+</div>
+<script src="/content/lib/layui-v2.9.18/layui.js" charset="utf-8"></script>
+<script>
+    layui.use(['form', 'table'], function () {
+        var $ = layui.jquery,
+            form = layui.form,
+            table = layui.table;
+
+        const CustomTable = function () {
+            self = this;
+            this.table_data = [
+                {
+                    'id': 0,
+                    'key': '不可修改key',
+                    'value': '不可修改value'
+                },
+                {
+                    'id': 2,
+                    'is_edit': true,
+                    'key': '可修改key',
+                    'value': '可修改value'
+                },
+                { //此行不能删除，是增加的事件
+                    'key': '',
+                    'value': ''
+                }]
+            this.id = {
+                tableId: 'currentTableId',
+                tableBar: '#tableBar',
+                tableRowBar: '#tableRowBar',
+            }
+            this.filter = {
+                tableBar: 'toolbar(currentTableFilter)',
+                tableRowBar: 'tool(currentTableFilter)',
+            }
+            this.is_edit = function (d) {
+                if (d.is_edit) return 'text';
+            };
+            this.table = function (data) {
+                table.render({
+                    elem: '#' + self.id.tableId,
+                    data: data,
+                    toolbar: false,
+                    defaultToolbar: [],
+                    css: [
+                        // 对开启了编辑的单元格追加样式
+                        '.layui-table-view td[data-edit]{color: #16B777;}'
+                    ].join(''),
+                    cols: [[
+                        {title: '序号', type: 'numbers'},
+                        {field: 'key', title: 'Key', width: 200, event: 'setKey', edit: self.is_edit},
+                        {field: 'value', title: 'Value', width: 200, event: 'setValue', edit: self.is_edit},
+                        {
+                            title: '操作', minWidth: 150, align: "center", templet: function (row) {
+                                if (row.id === 0 || row.add === true) {
+                                    return '';
+                                }
+                                return '<button type="button" class="layui-btn layui-bg-red layui-btn-xs" lay-event="del_params"><i class="layui-icon layui-icon-delete"></i></button>';
+                            },
+                        }
+                    ]],
+                    editTrigger: 'click',
+                    text: {
+                        none: '无参数'
+                    },
+                    width: 650,
+                    done: function (res, curr, count, origin) {
+                        let cell_tag = `'<td colspan="4" lay-event="add" data-field="add_params" data-key="1-0-0">
+                                            <div style="display: flex; justify-content: center;" class="layui-table-cell">
+                                            <i class="layui-icon layui-icon-addition"></i>增加
+                                            </div>
+                                            </td>`
+                        //处理单元格合并的问题
+                        $('.layui-table-body .layui-table').find('tr').last().html(cell_tag)
+                    }
+                })
+                return this;
+            }
+            this.add_event = function () {
+                $('body').on('click', '#get_table_param', function () {
+                    let table_json = table.getData(self.id.tableId);
+                    layer.msg(JSON.stringify(table_json))
+                })
+                return this;
+            }
+            //行操作
+            this.tableRowBar = function () {
+                table.on(self.filter.tableRowBar, function (row) {
+                    if (row.event === 'add') {
+                        //往数组增加元素
+                        self.table_data.splice(self.table_data.length - 1, 0, {
+                            'key': '',
+                            'value': '',
+                            'is_edit': true
+                        })
+                        self.table(self.table_data)
+                        return false;
+                    }
+                    if (row.event === 'del_params') {
+                        self.table_data.splice(row.index, 1);
+                        self.table(self.table_data)
+                        return false;
+                    }
+
+                })
+                return this;
+            }
+            this.init = function () {
+                this.table(self.table_data).tableRowBar().add_event();
+            };
+        }
+        const custom_table = new CustomTable();
+        custom_table.init();
+    });
+</script>
+</body>
+</html>

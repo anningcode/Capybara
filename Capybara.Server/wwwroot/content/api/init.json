@@ -1,0 +1,77 @@
+{
+  "homeInfo": {
+    "title": "首页",
+    "href": "/content/page/welcome-1.html?t=1"
+  },
+  "logoInfo": {
+    "title": "Capybara",
+    "image": "/content/images/logo.png",
+    "href": ""
+  },
+  "menuInfo": [
+    {
+      "title": "配置管理",
+      "icon": "fa fa-reorder",
+      "href": "",
+      "target": "_self",
+      "child": [
+        {
+          "title": "通用信息",
+          "href": "/general/index",
+          "icon": "fa fa-cog",
+          "target": "_self"
+        },
+        {
+          "title": "提示词管理",
+          "href": "/prompt/index",
+          "icon": "fa fa-file-powerpoint-o",
+          "target": "_self"
+        },
+        {
+          "title": "角色管理",
+          "href": "/role/index",
+          "icon": "fa fa-street-view",
+          "target": "_self"
+        },
+        {
+          "title": "技能管理",
+          "href": "/skill/index",
+          "icon": "fa fa-star-half-full",
+          "target": "_self"
+        },
+        {
+          "title": "工具管理",
+          "href": "/tool/index",
+          "icon": "fa fa-wrench",
+          "target": "_self"
+        },
+        {
+          "title": "账号管理",
+          "href": "/user/index",
+          "icon": "fa fa-users",
+          "target": "_self"
+        },
+        {
+          "title": "模型管理",
+          "href": "/model/index",
+          "icon": "fa fa-road",
+          "target": "_self"
+        }
+      ]
+    },
+    {
+      "title": "账号管理",
+      "icon": "fa fa-address-book",
+      "href": "",
+      "target": "_self",
+      "child": [
+        {
+          "title": "用户管理",
+          "href": "/webuser/index",
+          "icon": "fa fa-users",
+          "target": "_self"
+        }
+      ]
+    }
+  ]
+}

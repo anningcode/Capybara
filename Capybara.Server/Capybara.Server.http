@@ -1,0 +1,6 @@
+@Capybara.Server_HostAddress = http://localhost:5217
+
+GET {{Capybara.Server_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

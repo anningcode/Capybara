@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>用户信息</title>
+	<link rel="stylesheet" href="/content/lib/layui-v2.9.18/css/layui.css" media="all">
+    <link rel="stylesheet" href="/content/lib/font-awesome-4.7.0/css/font-awesome.min.css" media="all">
+    <link rel="stylesheet" href="/content/css/public.css" media="all">
+</head>
+<body>
+	<div class="layuimini-container">
+		<div class="layuimini-main">
+			<blockquote class="layui-elem-quote p10">
+				<form class="layui-form layui-form-pane" action="">
+					<div class="layui-form-item" style="margin-bottom:0px;">
+						<div class="layui-inline">
+							<label class="layui-form-label">名称：</label>
+							<div class="layui-input-inline">
+								<input type="number" name="id" placeholder="请输入ID" autocomplete="off" class="layui-input" />
+							</div>
+						</div>
+						<div class="layui-inline">
+							<label class="layui-form-label">名称：</label>
+							<div class="layui-input-inline">
+								<input type="text" name="name" placeholder="请输入名称" autocomplete="off" class="layui-input" />
+							</div>
+						</div>
+						<div class="layui-inline">
+							<label class="layui-form-label">角色ID：</label>
+							<div class="layui-input-inline">
+								<input type="number" name="roleId" placeholder="请输入角色ID" autocomplete="off" class="layui-input" />
+							</div>
+						</div>
+						<div class="layui-inline">
+							<label class="layui-form-label">启用：</label>
+							<div class="layui-input-inline">
+								<select name='enable'>
+									<option value=''></option>
+									<option value='true'> 启用 </option>
+									<option value='false'> 禁用 </option>
+								</select>
+							</div>
+						</div>
+						<div class="layui-inline">
+							<button type="submit" class="layui-btn layui-btn-normal" lay-submit lay-filter="data-search-btn"><i class="fa fa-search"></i> 搜 索&nbsp;&nbsp;</button>
+						</div>
+					</div>
+				</form>
+			</blockquote>
+			<div style="display: none;" id="zyupload" class="zyupload"></div>
+			<div class="layui-field-box" style="padding:0;">
+				<script type="text/html" id="toolbarDemo">
+					<div class="layui-btn-container">
+						<button class="layui-btn layui-btn-sm" lay-event="add" title="添加"><i class="fa fa-plus"> 添加</i></button>
+					</div>
+				</script>
+				<table class="layui-hide" id="currentTableId" lay-filter="currentTableFilter"></table>
+			</div>
+		</div>
+	</div>
+	<!-- 操作列 -->
+	<script type="text/html" id="currentTableBar">
+		<a class="layui-btn layui-btn-normal layui-btn-xs" lay-event="edit"><i class="fa fa-edit"></i> 编辑</a>
+		<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del"><i class="fa fa-times"></i> 删除</a>
+	</script>
+	<script src="/content/lib/layui-v2.9.18/layui.js" charset="utf-8"></script>
+	<script src="/content/js/lay-config.js?v=1.0.4" charset="utf-8"></script>
+	<script src="/content/lib/jquery-3.4.1/jquery-3.4.1.min.js" charset="utf-8"></script>
+	<script>
+		layui.use(['table', 'form', 'jquery'], function () {
+			var $ = layui.jquery,
+				table = layui.table,
+               form = layui.form,
+				laydate = layui.laydate;
+
+			//表格
+			table.render({
+				elem: '#currentTableId',
+				height: 'full-140', //高度最大化减去差值
+                url: '/user/load',  //数据接口
+				toolbar: '#toolbarDemo',
+				where: {
+                    id:'', name: '', roleId: '',enable: ''
+				},
+				cols: [[ //表头
+					{ field: 'id', title: 'Id', width: 300, fixed: 'left' },
+                    { field: 'roleId', title: '角色ID', width: 200 },
+                    { field: 'name', title: '名称', width: 120 },
+					{ field: 'age', title: '年纪', width: 120 },
+					{ 
+						field: 'sex', title: '性别', width: 120, templet: function (res) {
+							return res.sex == 1 ? '男' : '女';
+						} 
+					},
+					{ field: 'height', title: '身高', width: 120 },
+					{ field: 'weight', title: '体重', width: 120 },
+					{
+						field: 'enable', title: '启用', width: 80, templet: function (res) {
+							return res.enable ? '启用' : '禁用';
+						}
+					},
+                   { field: 'remarks', title: '备注', width: 200 },
+                    { toolbar: '#currentTableBar', width: 200, align: 'center',fixed: 'right'}
+				]],
+				limits: [50, 100],
+				limit: 50,
+				page: true
+			});
+			//搜索
+			form.on('submit(data-search-btn)', function (data) {
+				//执行搜索重载
+				table.reload('currentTableId', {
+					page: {
+						curr: 1
+					},
+					where: {
+                        id: data.field.id ,name: data.field.name, roleId: data.field.roleId, enable: data.field.enable
+					}
+				}, 'data');
+				return false;
+			});
+			//监听工具条
+			table.on('tool(currentTableFilter)', function (obj) {
+				var data = obj.data;
+				var layEvent = obj.event;
+				if (layEvent === 'edit') {
+					//多窗口模式，层叠置顶
+					layer.open({
+						type: 2
+						, title: '编辑'
+                        , area: ['680px', '410px']
+						, maxmin: true
+                        , content: '/user/editView?id=' + data.id
+					});
+				}
+				else if (layEvent === 'del') {
+					layer.confirm('确定要删除吗?', {
+						title: "询问",
+					}, function (index) {
+						$.ajax({
+							type: "POST",
+                            url: "/user/remove",
+							data: 'id=' + data.id,
+							async: false,
+							success: function (result) {
+                                if (result.code == 0) {
+									obj.del();//删除这一行
+									layer.close(index); //关闭弹框
+									layer.msg(result.message, {
+										icon: 1  //1:勾 6：笑脸
+									});
+								}
+								else {
+									layer.msg(result.message, {
+										icon: 5  //1:勾 6：笑脸
+									});
+								}
+							},
+							error: function (msg) {
+								layer.msg(result.message, {
+									icon: 5  //1:勾 6：笑脸
+								});
+							}
+						});
+						return false;
+					});
+				}
+			});
+			//toolbar监听事件
+			table.on('toolbar(currentTableFilter)', function (obj) {
+				if (obj.event === 'add') {  // 监听添加操作
+					//多窗口模式，层叠置顶
+					layer.open({
+						type: 2
+						, title: '添加'
+						, area: ['680px', '410px']
+						, maxmin: false
+                        , content: '/user/addView'
+					});
+				}
+			});
+		});
+	</script>
+</body>
+</html>

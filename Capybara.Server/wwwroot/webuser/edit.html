@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>添加用户信息</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="/content/lib/layui-v2.9.18/css/layui.css" media="all">
+    <link rel="stylesheet" href="/content/lib/font-awesome-4.7.0/css/font-awesome.min.css" media="all">
+    <link rel="stylesheet" href="/content/css/public.css" media="all">
+    <style>
+        .layui-btn:not(.layui-btn-lg ):not(.layui-btn-sm):not(.layui-btn-xs) {
+            height: 34px;
+            line-height: 34px;
+            padding: 0 8px;
+        }
+        .layui-iconpicker-body.layui-iconpicker-body-page .hide {
+            display: none;
+        }
+    </style>
+</head>
+<body style="background-color: #FFF;">
+    <div class="layuimini-main">
+        <div class="layui-col-md12 top10">
+            <form class="layui-form" action="">
+                <div class="layui-form-item">
+                    <input name="id" lay-verify="required" style="display: none;" lay-vertype="tips" class="layui-input" type="text" value="${model name:`WebUserConfigInfo`, property:`Id`}" />
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">名称：</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="name" lay-verify="required|account" lay-min="1" autocomplete="off" class="layui-input account" placeholder="请输入名称" value="${model name:`WebUserConfigInfo`, property:`Name`}" />
+                    </div>
+                    <label class="layui-form-label">账号：</label>
+                    <div class="layui-input-inline">
+                        <input type="text" name="code" lay-verify="required|account" lay-min="1" autocomplete="off" class="layui-input account" placeholder="请输入账号" value="${model name:`WebUserConfigInfo`, property:`Code`}" />
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">密码：</label>
+                    <div class="layui-input-inline">
+                        <input type="password" name="password" lay-verify="required|account" lay-min="1" autocomplete="off" class="layui-input account" placeholder="请输入密码" value="${model name:`WebUserConfigInfo`, property:`Password`}" />
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">状态：</label>
+                    <div class="layui-input-inline">
+                        <input name="enable" value="true" title="启用" ${if name:`WebUserConfigInfo`, property:`Enable`, value:`true`, ifval:`checked`} type="radio"/>
+                        <div class="layui-unselect layui-form-radio layui-form-radioed">
+                            <i class="layui-anim layui-icon"></i><div>启用</div>
+                        </div>
+                        <input name="enable" value="false" title="停用" ${if name:`WebUserConfigInfo`, property:`Enable`, value:`false`, ifval:`checked`} type="radio"/>
+                        <div class="layui-unselect layui-form-radio">
+                            <i class="layui-anim layui-icon"></i><div>停用</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <label class="layui-form-label">备注：</label>
+                    <div class="layui-input-block">
+                        <textarea class="layui-textarea" cols="20" id="remarks" lay-verify="pass" lay-vertype="tips" name="remarks" rows="2" placeholder="请输入备注">${model name:`WebUserConfigInfo`, property:`Remarks`}</textarea>
+                    </div>
+                </div>
+                <div class="layui-form-item">
+                    <div class="layui-input-block">
+                        <button class="layui-btn" lay-submit="" lay-filter="submitForm">立即提交</button>
+                        <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script src="/content/lib/layui-v2.9.18/layui.js" charset="utf-8"></script>
+    <script src="/content/js/lay-config.js?v=1.0.4" charset="utf-8"></script>
+    <script>
+        //关闭页面
+        function CloseWin() {
+            parent.location.reload(); // 父页面刷新
+            var index = parent.layer.getFrameIndex(window.name); //先得到当前iframe层的索引
+            parent.layer.close(index); //再执行关闭
+        }
+        layui.use(['jquery', 'form', 'layer'], function () {
+            var $ = layui.jquery,
+                form = layui.form,
+                layer = layui.layer;
+            //监听提交
+            form.on('submit(submitForm)', function (data) {
+                data.field.enable = (data.field.enable === "true");
+                $.ajax({
+                    type: 'POST',
+                    url: '/webuser/edit',
+                    data: JSON.stringify(data.field),
+                    async: false,
+                    dataType: 'json',
+                    contentType: 'application/json',
+                    success: function (result) {
+                        if (result.code == 0) {
+                            layer.msg(result.message, {
+                                icon: 1  //1:勾 6：笑脸
+                            });
+                            setTimeout(CloseWin, 1000);
+                        }
+                        else {
+                            layer.msg(result.message, {
+                                icon: 5  //1:勾 6：笑脸
+                            });
+                        }
+                    },
+                    error: function (msg) {
+                        layer.msg(result.message, {
+                            icon: 5  //1:勾 6：笑脸
+                        });
+                    }
+                });
+                return false;
+            });
+            //验证输入大小
+            form.verify({
+                account: function (value, item) {
+                    var min = item.getAttribute('lay-min');
+                    if (value.length < min) {
+                        return '输入内容不能小于' + min + '';
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>

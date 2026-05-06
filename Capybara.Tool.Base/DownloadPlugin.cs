@@ -12,7 +12,7 @@ namespace Capybara.Tool.Base
     {
         [AgentFunction("add_download_file")]
         [Description("添加到下载文件列表")]
-        public string AddDownloadFile([Description("文件完整路径")] string path)
+        public string AddDownloadFile([Description("文件相对路径")] string path)
         {
             return string.Empty;
         }

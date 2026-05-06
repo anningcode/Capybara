@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+	<!-- 身份 -->
+	<user>
+		<!-- 节点配置 name:节点名称 code:用户代码  password:密码 -->
+		<item name="智能体" code="agent" password="123456" enable="true" remarks="智能体"/>
+	</user>
+	<!-- 日志 -->
+	<logger>
+		<!-- 类型,1:身份认证,2:身份认证响应,3:订阅,4:删除订阅,5:发布,6:发布响应,7:心跳,8:详情,9:详情响应 -->
+		<item id="1" type="1" enable="false" remarks="身份认证"/>
+		<item id="2" type="2" enable="false" remarks="身份认证响应"/>
+		<item id="3" type="3" enable="false" remarks="订阅"/>
+		<item id="4" type="4" enable="false" remarks="订阅响应"/>
+		<item id="5" type="5" enable="false" remarks="删除订阅"/>
+		<item id="6" type="6" enable="true" remarks="发布"/>
+		<item id="7" type="7" enable="true" remarks="发布响应"/>
+		<item id="8" type="8" enable="false" remarks="心跳"/>
+		<item id="9" type="9" enable="false" remarks="详情"/>
+		<item id="10" type="10" enable="false" remarks="详情响应"/>
+		<item id="11" type="11" enable="false" remarks="关注"/>
+		<item id="12" type="12" enable="false" remarks="关注响应"/>
+	</logger>
+	<!-- 父节点 -->
+	<client>
+		<item ip="127.0.0.1" port="30001" enable="true" remarks="客户端"/>
+	</client>
+	<!-- 订阅 -->
+	<subscribe>
+		<!-- node:订阅节点名称 app:应用名称 inout:0允许所有,1允许子站点,2允许父站点 -->
+		<item key="AgentChatRequest" route="agent/request" enable="true" remarks="订阅"/>
+	</subscribe>
+	<!-- 发布 -->
+	<publisher>
+		<!-- node:发布节点名称 app:应用名称 inout:0允许所有,1允许子站点,2允许父站点 -->
+	</publisher>
+</root>

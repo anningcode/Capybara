@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>layui</title>
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <link rel="stylesheet" href="/content/lib/layui-v2.9.18/css/layui.css" media="all">
+</head>
+<body>
+<div class="layui-bg-gray" style="padding: 16px;">
+    <div class="layui-row layui-col-space15">
+        <div class="layui-col-md2">
+            <div class="layui-card">
+                <div class="layui-card-header">树</div>
+                <div class="layui-form-item">
+                    <div class="layui-input-group" style="padding: 0 15px">
+                        <input type="text" name="treeSearchName" placeholder="搜索" class="layui-input">
+                        <div class="layui-input-split layui-input-suffix" style="cursor: pointer;" lay-on="treeSearch">
+                            <i class="layui-icon layui-icon-search"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-card-body">
+                    <div id="ID-tree-demo-showLine"></div>
+                </div>
+            </div>
+        </div>
+        <div class="layui-col-md10">
+            <div class="layui-card">
+                <div class="layui-card-header">表</div>
+                <div class="layui-card-body">
+                    <form class="layui-form layui-row layui-col-space16">
+                        <div class="layui-col-md3">
+                            <div class="layui-input-wrap">
+                                <div class="layui-input-prefix">
+                                    <i class="layui-icon layui-icon-username"></i>
+                                </div>
+                                <input type="text" name="A" value="" placeholder="用户名" class="layui-input"
+                                       lay-affix="clear">
+                            </div>
+                        </div>
+                        <div class="layui-col-md3">
+                            <div class="layui-input-wrap">
+                                <input type="text" name="B" placeholder="城市" lay-affix="clear" class="layui-input">
+                            </div>
+                        </div>
+                        <div class="layui-col-md3">
+                            <div class="layui-input-wrap">
+                                <div class="layui-input-prefix">
+                                    <i class="layui-icon layui-icon-date"></i>
+                                </div>
+                                <input type="text" name="C" readonly placeholder="选择时间"
+                                       class="layui-input demo-table-search-date">
+                            </div>
+                        </div>
+                        <div class="layui-col-md3">
+                            <button class="layui-btn" lay-submit lay-filter="demo-table-search">查询</button>
+                            <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                        </div>
+                    </form>
+                    <table class="layui-hide" id="ID-table-demo-search"></table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="/content/lib/layui-v2.9.18/layui.js" charset="utf-8"></script>
+<script src="/content/apijs/tree_table.js" charset="utf-8"></script>
+<script>
+    layui.use(['tree', 'table', 'form', 'laydate', 'util', 'jquery'], function () {
+        let tree = layui.tree,
+            $ = layui.jquery,
+            table = layui.table,
+            form = layui.form,
+            util = layui.util,
+            laydate = layui.laydate;
+
+        // 模拟数据
+        var data = [{
+            title: '江西',
+            id: 1,
+            children: [{
+                title: '南昌',
+                id: 1000,
+                children: [{title: '青山湖区', id: 10001}, {title: '高新区', id: 10002}]
+            }, {title: '九江', id: 1001}, {title: '赣州', id: 1002}]
+        }, {title: '广西', id: 2, children: [{title: '南宁', id: 2000}, {title: '桂林', id: 2001}]}, {
+            title: '陕西',
+            id: 3,
+            children: [{title: '西安', id: 3000}, {title: '延安', id: 3001}]
+        }, {title: '山西', id: 3, children: [{title: '太原', id: 4000}, {title: '长治', id: 4001}]}];
+        // 渲染
+        tree.render({
+            elem: '#ID-tree-demo-showLine',
+            data: data,
+            showLine: true,  // 是否开启连接线
+            click: function (obj) {
+                var data = obj.data;  //获取当前点击的节点数据
+                layer.msg('状态：' + obj.state + '<br>节点数据：' + JSON.stringify(data));
+            }
+        });
+
+        // 按钮事件
+        util.event('lay-on', {
+            treeSearch: function (othis) {
+                let search_field = {'name': $('input[name="treeSearchName"]').val()}
+                layer.msg('搜索条件：' + JSON.stringify(search_field))
+
+                //请求服务器自己实现
+                $.ajax({
+                    url: "/search_tree",
+                    type: 'GET',
+                    dataType: 'JSON',
+                    data: search_field,
+                    success: function (resp) {
+                        if (resp.status === 0) {
+                            //重载或渲染
+                            // 渲染
+                            tree.render({
+                                elem: '', // 绑定元素选择器
+                                id: 'test', // 自定义 id 索引
+                                // 其他属性 …
+                            });
+                            // 重载
+                            tree.reload('test', { // options
+                                data: resp.data
+                            });
+                        } else {
+                            layer.msg('查询失败')
+                        }
+                    }
+                });
+            }
+        });
+
+        // 创建表格实例
+        table.render({
+            elem: '#ID-table-demo-search',
+            // url: '/static/json/2/table/user.json', // 此处为静态模拟数据，实际使用时需换成真实接口
+            data: getJson().data,
+            cols: [[
+                {type: 'checkbox', fixed: true}, // 单选框
+                {field: 'id', title: 'ID', width: 80, sort: true, fixed: true},
+                {field: 'username', title: '用户名'},
+                {field: 'sex', title: '性别', sort: true},
+                {field: 'city', title: '城市'},
+            ]],
+            page: true,
+            height: 310
+        });
+        // 日期
+        laydate.render({
+            elem: '.demo-table-search-date'
+        });
+        // 搜索提交
+        form.on('submit(demo-table-search)', function (data) {
+            var field = data.field; // 获得表单字段
+            // 执行搜索重载
+            table.reload('ID-table-demo-search', {
+                page: {
+                    curr: 1 // 重新从第 1 页开始
+                },
+                where: field // 搜索的字段
+            });
+            layer.msg('搜索成功<br>此处为静态模拟数据，实际使用时换成真实接口即可');
+            return false; // 阻止默认 form 跳转
+        });
+    });
+</script>
+</body>
+</html>

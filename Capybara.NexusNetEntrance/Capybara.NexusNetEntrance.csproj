@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Capybara.IEntrance\Capybara.IEntrance.csproj" />
+    <ProjectReference Include="..\Capybara.Utils\Capybara.Utils.csproj" />
     <ProjectReference Include="..\NexusNetNetwork\NexusNetNetwork.csproj" />
   </ItemGroup>
 

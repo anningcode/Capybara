@@ -11,8 +11,8 @@ namespace Capybara.IService
     {
         WebResponseInfo<AgentChatSkillInfo> Select(int? id, string? skillName, bool? enable);
         AgentChatSkillInfo? Select(int id);
-        bool Update(AgentChatSkillInfo model);
-        bool Insert(AgentChatSkillInfo model);
+        bool Update(AgentChatSkillInfo value);
+        bool Insert(AgentChatSkillInfo value);
         bool Delete(int id);
     }
 }

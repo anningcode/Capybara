@@ -294,7 +294,7 @@ namespace Capybara.Agent
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                Logger.Error(ex.Message);
             }
         }
         // 加载子智能体信息
@@ -436,7 +436,7 @@ namespace Capybara.Agent
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                Logger.Error(ex.Message);
                 return false;
             }
         }
@@ -471,7 +471,7 @@ namespace Capybara.Agent
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                Logger.Error(ex.Message);
                 return null;
             }
         }

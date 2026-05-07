@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ModelContextProtocol" Version="1.2.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Capybara.Models\Capybara.Models.csproj" />
+    <ProjectReference Include="..\Capybara.Tool\Capybara.Tool.csproj" />
+    <ProjectReference Include="..\Capybara.Utils\Capybara.Utils.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -11,8 +11,55 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Capybara.Agent\Capybara.Agent.csproj" />
+    <ProjectReference Include="..\Capybara.IEntrance\Capybara.IEntrance.csproj" />
+    <ProjectReference Include="..\Capybara.NexusNetEntrance\Capybara.NexusNetEntrance.csproj" />
     <ProjectReference Include="..\Capybara.Service\Capybara.Service.csproj" />
+    <ProjectReference Include="..\Capybara.TcpEntrance\Capybara.TcpEntrance.csproj" />
+    <ProjectReference Include="..\Capybara.Tool.Base\Capybara.Tool.Base.csproj" />
+    <ProjectReference Include="..\Capybara.Tool.Mcp\Capybara.Tool.Mcp.csproj" />
+    <ProjectReference Include="..\Capybara.Utils\Capybara.Utils.csproj" />
+    <ProjectReference Include="..\NexusNetNetwork\NexusNetNetwork.csproj" />
     <ProjectReference Include="..\Robot.WebApi\Robot.WebApi.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="capybara\skills\email\scripts\send_email.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="capybara\skills\email\scripts\__pycache__\email.cpython-38.pyc">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="capybara\skills\email\SKILL.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="capybara\skills\notice\scripts\notice.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="capybara\skills\notice\SKILL.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="capybara\skills\SKILL.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="capybara\skills\xlsxstyle\references\人员.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="capybara\skills\xlsxstyle\SKILL.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="capybara\skills\xlsx\LICENSE.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="capybara\skills\xlsx\recalc.py">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="capybara\skills\xlsx\SKILL.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="config\nexus_net_config.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

@@ -1,7 +1,7 @@
 using Capybara.IEntrance;
 using Capybara.Models;
+using Capybara.Utils;
 using Newtonsoft.Json;
-using NLog;
 using TcpNetwork;
 
 namespace Capybara.TcpEntrance
@@ -22,7 +22,6 @@ namespace Capybara.TcpEntrance
     }
     public class ChatTcpEntrance : IChatEntrance
     {
-        private static Logger logger_ = LogManager.Setup().LoadConfigurationFromFile("config/nlog.config").GetCurrentClassLogger();
         private TcpListenerNetwork server_ { get; set; } = new TcpListenerNetwork();
         public Action<AgentChatMessageInfo>? onRequest { get; set; }
         public ChatTcpEntrance(string param)
@@ -47,7 +46,7 @@ namespace Capybara.TcpEntrance
             }
             catch (Exception ex)
             {
-                logger_.Error(ex.Message);
+                Logger.Error(ex.Message);
                 return false;
             }
         }
@@ -68,7 +67,7 @@ namespace Capybara.TcpEntrance
             }
             catch (Exception ex)
             {
-                logger_.Error(ex.Message);
+                Logger.Error(ex.Message);
             }
         }
         private void OnDisconnect(TcpClientNetwork session)

@@ -1,4 +1,5 @@
 using Capybara.IService;
+using Capybara.Server.entrance;
 using Capybara.Service;
 using Microsoft.AspNetCore.Rewrite;
 
@@ -34,6 +35,7 @@ class Program
         builder.Services.AddScoped<IToolService, ToolService>();
         builder.Services.AddScoped<IUserService, UserService>();
         builder.Services.AddScoped<IWebUserService, WebUserService>();
+        builder.Services.AddScoped<IMCPService, MCPService>();
 
         var app = builder.Build();
         app.UseRouting();
@@ -52,6 +54,9 @@ class Program
         app.UseHttpsRedirection();
         app.UseWebSockets();
         app.MapControllers();
+
+        ChatEntrance chatEntrance = new ChatEntrance();
+        chatEntrance.Init();
 
         app.Run();
     }

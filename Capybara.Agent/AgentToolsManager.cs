@@ -45,8 +45,7 @@ namespace Capybara.Agent
         private static List<IToolPlugin> loadPlugins()
         {
             List<IToolPlugin> result = new List<IToolPlugin>();
-            string folderPath = "./plugins";
-            var dllFiles = Directory.EnumerateFiles(folderPath, "*.dll", SearchOption.AllDirectories);
+            var dllFiles = Directory.EnumerateFiles(Path.Join(AppContext.BaseDirectory, "plugins"), "*.dll", SearchOption.AllDirectories);
 
             foreach (var path in dllFiles)
             {

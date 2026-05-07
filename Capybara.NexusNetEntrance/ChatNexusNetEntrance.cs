@@ -1,16 +1,14 @@
 using Capybara.IEntrance;
 using Capybara.Models;
+using Capybara.Utils;
 using Newtonsoft.Json;
 using NexusNetNetwork;
-using NLog;
 using TcpNetwork;
 
 namespace Capybara.NexusNetEntrance
 {
     public class ChatNexusNetEntrance : IChatEntrance
     {
-        // 日志
-        private static Logger logger_ = LogManager.Setup().LoadConfigurationFromFile("config/nlog.config").GetCurrentClassLogger();
         private NexusNetInstance chatClient_ { get; set; } = NexusNetInstance.Instance();
         private Dictionary<string, TcpClientNetwork> tcpClientList_ { get; set; } = new Dictionary<string, TcpClientNetwork>();
         public Action<AgentChatMessageInfo>? onRequest { get; set; }
@@ -35,7 +33,7 @@ namespace Capybara.NexusNetEntrance
             }
             catch (Exception ex)
             {
-                logger_.Error(ex.Message);
+                Logger.Error(ex.Message);
                 return false;
             }
         }
@@ -57,15 +55,15 @@ namespace Capybara.NexusNetEntrance
             {
                 var chat = JsonConvert.DeserializeObject<AgentChatMessageInfo>(json);
                 if (chat == null) return;
-                ConnectTcpServer(chat.Address, chat.SessionId);
+                ConnectTcpServer(chat.Address, chat.SessionId).Wait();
                 onRequest?.Invoke(chat);
             }
             catch (Exception ex)
             {
-                logger_.Error(ex.Message);
+                Logger.Error(ex.Message);
             }
         }
-        private async void ConnectTcpServer(string address, string sessionId)
+        private async Task ConnectTcpServer(string address, string sessionId)
         {
             TcpClientNetwork tcpClient = new TcpClientNetwork();
             tcpClient.onConnect = OnConnect;
@@ -103,11 +101,11 @@ namespace Capybara.NexusNetEntrance
         {
             if (!status)
             {
-                logger_.Error($"连接服务器失败: {message}");
+                Logger.Error($"连接服务器失败: {message}");
             }
             else
             {
-                logger_.Info($"连接服务器成功!");
+                Logger.Info($"连接服务器成功!");
             }
         }
     }

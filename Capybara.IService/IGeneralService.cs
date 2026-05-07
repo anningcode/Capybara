@@ -11,8 +11,8 @@ namespace Capybara.IService
     {
         WebResponseInfo<WebGeneralConfigInfo> Select(int? id, string? key,string ?value, bool? enable);
         WebGeneralConfigInfo? Select(int id);
-        bool Update(WebGeneralConfigInfo model);
-        bool Insert(WebGeneralConfigInfo model);
+        bool Update(WebGeneralConfigInfo value);
+        bool Insert(WebGeneralConfigInfo value);
         bool Delete(int id);
     }
 }

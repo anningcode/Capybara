@@ -783,8 +783,6 @@ namespace Capybara.Agent
 
                 toolCall.Response = $"创建成功,智能体ID: {agentId}";
 
-                Console.WriteLine("====================================================================");
-
                 session.GetSession().Message.Type = -1;
                 session.AddSubAgent(agentId);
                 Request(session);

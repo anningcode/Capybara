@@ -32,8 +32,6 @@ public class Core
     }
     private bool OnResponse(AgentChatMessageInfo response)
     {
-        Console.WriteLine(JsonConvert.SerializeObject(response));
-
         if (response.Type == AgentChatToolCallResponseInfo.Type)
         {
             AgentChatToolCallResponseInfo? value = JsonConvert.DeserializeObject<AgentChatToolCallResponseInfo>(response.Data) ?? new();

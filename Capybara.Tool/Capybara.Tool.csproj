@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Capybara.Models\Capybara.Models.csproj" />
+    <ProjectReference Include="..\Capybara.Utils\Capybara.Utils.csproj" />
   </ItemGroup>
 
 </Project>

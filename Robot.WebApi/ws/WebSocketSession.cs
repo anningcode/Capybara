@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
+using NLog;
 using Robot.WebApi.http;
 using Robot.WebApi.models;
 using System;
@@ -15,6 +16,7 @@ namespace Robot.WebApi.ws
 {
     public class WebSocketSession : IDisposable
     {
+        private static Logger logger_ = LogManager.Setup().LoadConfigurationFromFile("config/nlog.config").GetCurrentClassLogger();
         private List<IWController> sessions_ { get; set; } = new();
         private WebSocket? webSocketSession_ { get; set; }
         private HttpSession? httpSession_ { get; set; }
@@ -84,17 +86,17 @@ namespace Robot.WebApi.ws
             catch (WebSocketException wse) when (wse.WebSocketErrorCode == WebSocketError.ConnectionClosedPrematurely)
             {
                 // 客户端提前关闭连接
-                Console.WriteLine($"WebSocket连接被客户端意外关闭: {wse.Message}");
+                logger_.Error($"WebSocket连接被客户端意外关闭: {wse.Message}");
             }
             catch (OperationCanceledException)
             {
                 // 操作被取消
-                Console.WriteLine("WebSocket操作被取消");
+                logger_.Error("WebSocket操作被取消");
             }
             catch (IOException)
             {
                 // 客户端重置连接
-                Console.WriteLine("客户端重置了连接");
+                logger_.Error("客户端重置了连接");
             }
             finally
             {

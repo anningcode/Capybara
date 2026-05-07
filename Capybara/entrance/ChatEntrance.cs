@@ -1,9 +1,9 @@
 using Capybara.Agent;
 using Capybara.IEntrance;
 using Capybara.Models;
+using Capybara.Utils;
 using Newtonsoft.Json;
 using NexusNetNetwork;
-using NLog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,8 +16,6 @@ namespace Capybara.entrance
 {
     public class ChatEntrance
     {
-        // 日志
-        private static Logger logger_ = LogManager.Setup().LoadConfigurationFromFile("config/nlog.config").GetCurrentClassLogger();
         private List<IChatEntrance> chatEntrances_ { get; set; } = new List<IChatEntrance>();
         private NexusNetInstance nexusNetEntrance_ { get; set; } = NexusNetInstance.Instance();
         private AgentRuntime agentRuntime_ { get; set; }
@@ -39,7 +37,6 @@ namespace Capybara.entrance
             {
                 agentRuntime_.Request(request);
             }
-            Console.WriteLine("收到:" + JsonConvert.SerializeObject(request));
         }
         private bool OnResponse(AgentChatMessageInfo response)
         {
@@ -51,7 +48,6 @@ namespace Capybara.entrance
                     success = true;
                 }
             }
-            Console.WriteLine(JsonConvert.SerializeObject(response));
             return success;
         }
         // 加载模块
@@ -79,7 +75,7 @@ namespace Capybara.entrance
                 }
                 catch (Exception ex)
                 {
-                    logger_.Error(ex);
+                    Logger.Error(ex.Message);
                 }
             }
         }
@@ -116,21 +112,21 @@ namespace Capybara.entrance
             }
             catch (Exception ex)
             {
-                logger_.Error(ex);
+                Logger.Error(ex.Message);
             }
             return new List<AgentChatEntranceInfo>();
         }
         private void OnConnect(bool status)
         {
-            logger_.Info($"连接状态:{status}");
+            Logger.Info($"连接状态:{status}");
         }
         private void OnDisconnect()
         {
-            logger_.Info("连接断开");
+            Logger.Info("连接断开");
         }
         private void OnAuthorize(bool success, string parentCode, string parentName)
         {
-            logger_.Info($"授权结果:{success}, 父级编码:{parentCode}, 父级名称:{parentName}");
+            Logger.Info($"授权结果:{success}, 父级编码:{parentCode}, 父级名称:{parentName}");
         }
     }
 }

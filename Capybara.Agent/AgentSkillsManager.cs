@@ -32,7 +32,7 @@ namespace Capybara.Agent
         {
             try
             {
-                return File.ReadAllText(path);
+                return File.ReadAllText(Path.Join(AppContext.BaseDirectory, path));
             }
             catch
             {
@@ -47,7 +47,7 @@ namespace Capybara.Agent
                 string result = "";
                 int status = 0;
                 int type = 0;
-                using (StreamReader reader = new StreamReader(path, Encoding.UTF8))
+                using (StreamReader reader = new StreamReader(Path.Join(AppContext.BaseDirectory, path), Encoding.UTF8))
                 {
                     string? line;
                     while ((line = reader.ReadLine()) != null)

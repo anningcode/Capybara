@@ -56,6 +56,12 @@
           "href": "/model/index",
           "icon": "fa fa-road",
           "target": "_self"
+        },
+        {
+          "title": "MCP管理",
+          "href": "/mcp/index",
+          "icon": "fa fa-puzzle-piece",
+          "target": "_self"
         }
       ]
     },

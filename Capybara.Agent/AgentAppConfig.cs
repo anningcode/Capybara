@@ -49,7 +49,9 @@ namespace Capybara.Agent
         // 获取工具
         public static List<LLMToolDefinitionInfo> GetTools(List<AgentChatToolInfo> tools)
         {
-            return AgentToolsManager.GetTools(tools.Where(n=>n.Enable).Select(t => t.ToolName).ToList());
+            var list = tools.Where(n => n.Enable);
+            var list1 = list.Select(t => t.ToolName).ToList();
+            return AgentToolsManager.GetTools(list1);
         }
         // 获取skills
         public static List<AgentChatSkillInfo> GetSkills(List<string> skills)

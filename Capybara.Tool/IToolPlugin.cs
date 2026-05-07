@@ -1,4 +1,5 @@
 using Capybara.Models;
+using Capybara.Utils;
 using LLMGateway.Models;
 using Newtonsoft.Json.Linq;
 using System.ComponentModel;
@@ -203,7 +204,7 @@ namespace Capybara.Tool
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(ex.Message);
+                    Logger.Error(ex.Message);
                 }
             }
             return result;

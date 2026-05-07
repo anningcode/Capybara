@@ -3,6 +3,9 @@ using Capybara.Models;
 using Microsoft.AspNetCore.Mvc;
 using Robot.WebApi.http;
 using Robot.WebApi.models;
+using System.Diagnostics;
+using System.Reflection;
+using System.Runtime.CompilerServices;
 
 namespace Capybara.Server.Controllers
 {
@@ -12,16 +15,16 @@ namespace Capybara.Server.Controllers
     public class AccountController : HController
     {
         private IAccoutService account_ { get; set; }
-        [HttpGet("index")]
+        public AccountController(IAccoutService account)
+        {
+            account_ = account;
+        }
         [AuthReverse]
+        [HttpGet("index")]
         [FileMapping("account/index.html")]
         public IActionResult Index()
         {
             return View();
-        }
-        public AccountController(IAccoutService account)
-        {
-            account_ = account;
         }
         [HttpGet("login")]
         [AuthReverse]

@@ -741,8 +741,6 @@ namespace Capybara.Agent
                 };
                 // 上下文
                 LLMChatRequestInfo request = new LLMChatRequestInfo();
-                // LLM地址
-                //request.Address = session.GetSession().Config.Roles[0].LlmAddress;
                 // 模型名称
                 request.Model = session.GetSession().Config.Models[0].ModelName;
                 // 最大token数量

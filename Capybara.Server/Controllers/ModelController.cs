@@ -3,6 +3,7 @@ using Capybara.Models;
 using Microsoft.AspNetCore.Mvc;
 using Robot.WebApi.http;
 using Robot.WebApi.models;
+using System.Runtime.CompilerServices;
 
 namespace Capybara.Server.Controllers
 {

@@ -9,6 +9,10 @@ public class LLMChatRequestInfo
 {
     [JsonProperty("name")]
     public string Name { get; set; } = string.Empty;
+
+    [JsonProperty("appKey")]
+    public string AppKey { get; set; } = string.Empty;
+
     [JsonProperty("model")]
     public string Model { get; set; } = string.Empty;
 

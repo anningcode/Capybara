@@ -8,6 +8,7 @@ using System.Diagnostics;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Metadata.Ecma335;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -934,15 +935,14 @@ namespace Robot.WebApi.http
             // 5. 返回文件流（框架自动处理 Range 和 释放流）
             return File(fileStream, "application/octet-stream", fileInfo.Name);
         }
-        protected IActionResult View()
+        protected IActionResult View([CallerMemberName] string callerName = "")
         {
-            var stackTrace = new StackTrace(1, false);
-            var frame = stackTrace.GetFrame(0);
-            var attr = frame?.GetMethod()?.GetCustomAttribute<FileMappingAttribute>();
-            if (attr == null) return NotFound(new { error = "文件映射失败" });
+            var callerMethod = GetType().GetMethod(callerName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)?.GetCustomAttribute<FileMappingAttribute>();
+            
+            if (callerMethod == null) return NotFound(new { error = "文件映射失败" });
 
-            string path = Path.Join(wwwroot_, attr.FileName);
-
+            string path = Path.Join(wwwroot_, callerMethod.FileName);
+            
             if (!System.IO.File.Exists(path)) return NotFound(new { error = "文件映射失败" });
 
             var htmlContent = System.IO.File.ReadAllText(path);
@@ -958,14 +958,13 @@ namespace Robot.WebApi.http
 
             return Content(htmlContent, contentType, System.Text.Encoding.UTF8);
         }
-        protected IActionResult View(dynamic value)
+        protected IActionResult View(dynamic value, [CallerMemberName] string callerName = "")
         {
-            var stackTrace = new StackTrace(1, false);
-            var frame = stackTrace.GetFrame(0);
-            var attr = frame?.GetMethod()?.GetCustomAttribute<FileMappingAttribute>();
-            if (attr == null) return NotFound(new { error = "文件映射失败" });
+            var callerMethod = GetType().GetMethod(callerName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)?.GetCustomAttribute<FileMappingAttribute>();
 
-            string path = Path.Join(wwwroot_, attr.FileName);
+            if (callerMethod == null) return NotFound(new { error = "文件映射失败" });
+
+            string path = Path.Join(wwwroot_, callerMethod.FileName);
 
             if (!System.IO.File.Exists(path)) return NotFound(new { error = "文件映射失败" });
 
@@ -989,14 +988,13 @@ namespace Robot.WebApi.http
             }
             return Content(htmlContent, contentType, System.Text.Encoding.UTF8);
         }
-        protected IActionResult View<T>(T value) where T : class, new()
+        protected IActionResult View<T>(T value, [CallerMemberName] string callerName = "") where T : class, new()
         {
-            var stackTrace = new StackTrace(1, false);
-            var frame = stackTrace.GetFrame(0);
-            var attr = frame?.GetMethod()?.GetCustomAttribute<FileMappingAttribute>();
-            if (attr == null) return NotFound(new { error = "文件映射失败" });
+            var callerMethod = GetType().GetMethod(callerName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)?.GetCustomAttribute<FileMappingAttribute>();
 
-            string path = Path.Join(wwwroot_, attr.FileName);
+            if (callerMethod == null) return NotFound(new { error = "文件映射失败" });
+
+            string path = Path.Join(wwwroot_, callerMethod.FileName);
 
             if (!System.IO.File.Exists(path)) return NotFound(new { error = "文件映射失败" });
 

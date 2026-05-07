@@ -1,69 +1,75 @@
-﻿using LLMGateway.Models;
+﻿using Capybara.Utils;
+using LLMGateway.Models;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Sockets;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Capybara.LLM
 {
-    internal class LLMNetworkRequest
+    internal class LLMNetworkRequest : IDisposable
     {
-        private WebSocketClient _client { get; set; } = new();
-        private LLMChatResponseInfo _response { get; set; } = new();
-        public bool Start(string url)
+        private TcpClient client_ { get; set; } = new TcpClient();
+        private Func<LLMChatResponseInfo, bool>? onRecv { get; set; }
+        public void Dispose()
         {
-            bool result = _client.Start(url).Result;
-            return result;
+            Stop();
         }
-        public LLMChatResponseInfo Request(string url, LLMChatRequestInfo request, Func<LLMChatResponseInfo, bool> callback)
+        public bool Request(Tuple<string, int> config, LLMChatRequestInfo data, Func<LLMChatResponseInfo, bool> callback)
         {
             try
             {
-                if (!Start(url)) 
-                {
-                    _client.Stop().Wait();
-                    throw new Exception("连接websocket失败!");
-                }
-                _client.Send(JsonConvert.SerializeObject(request)).Wait();
-                Receive(callback).Wait();
-                _client.Stop().Wait();
+                onRecv = callback;
+                Start(config);
+                Send(JsonConvert.SerializeObject(data));
+                Receive();
+                Stop();
+                return true;
             }
             catch (Exception ex)
             {
-                _response.Stop = true;
-                _response.Success = false;
-                _response.Message = ex.Message;
+                Logger.Error(ex.Message);
             }
-            return _response;
+            return false;
         }
-        private async Task Receive(Func<LLMChatResponseInfo, bool> callback)
+        private void Start(Tuple<string, int> address)
         {
-            try
+            client_ = new TcpClient();
+            client_.Connect(address.Item1, address.Item2);
+        }
+        private void Stop()
+        {
+            client_.Close();
+        }
+        private void Send(string data)
+        {
+            NetworkStream stream = client_.GetStream();
+            var writer = new StreamWriter(stream);
+            writer.Write(data + "\r\n");
+            writer.Flush();
+        }
+        private void Receive()
+        {
+            using (NetworkStream stream = client_.GetStream())
             {
-                while (true)
+                using var reader = new StreamReader(stream);
+                while (client_.Connected)
                 {
-                    string? value = await _client.Receive();
-                    if (value == null) break;
-                    var response = JsonConvert.DeserializeObject<LLMChatResponseInfo>(value);
-                    if (response == null) throw new Exception("反序列化失败!");
-                    if (response.Stop)
-                    {
-                        _response = response;
-                        break;
-                    }
-                    else if (!callback.Invoke(response))
+                    string? line;
+                    line = reader.ReadLine();
+                    if (line == null) break;
+                    var json = JsonConvert.DeserializeObject<LLMChatResponseInfo>(line);
+                    if (json == null) throw new Exception("JSON为null反序列化数据异常!");
+                    if (!onRecv?.Invoke(json) ?? true)
                     {
                         break;
                     }
+                    if (json.Stop)
+                        break;
                 }
-            }
-            catch (Exception ex)
-            {
-                _response.Stop = true;
-                _response.Success = false;
-                _response.Message = ex.Message;
             }
         }
     }

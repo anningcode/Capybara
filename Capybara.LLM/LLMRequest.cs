@@ -9,21 +9,57 @@ using System.Threading.Tasks;
 
 namespace Capybara.LLM
 {
-    public class LLMRequest
+    public static class LLMRequest
     {
-        private static LLMNetworkRequest request_ { get; set; } = new LLMNetworkRequest();
         public static LLMChatResponseInfo Request(LLMChatRequestInfo request, Func<LLMChatResponseInfo, bool> callback)
         {
-            string url = "ws://127.0.0.1:5000/ws";
-            string appKey = "123456789";
+            LLMChatResponseInfo response   = new LLMChatResponseInfo();
+            LLMNetworkRequest   tcpRequest = new LLMNetworkRequest();
+            Tuple<string, int>  config     = Tuple.Create("127.0.0.1", 5000);
             var values = AppConfig.Get<List<WebGeneralConfigInfo>>("generals");
             if (values != null)
             {
-                url = values.FirstOrDefault(n => n.Key == "llmAddress" && n.Enable)?.Value ?? url;
-                appKey = values.FirstOrDefault(n => n.Key == "appKey" && n.Enable)?.Value ?? appKey;
+                var address = values.FirstOrDefault(n => n.Key == "llmAddress" && n.Enable)?.Value ?? "127.0.0.1:5000";
+                if (address.Split(':').Length == 2)
+                {
+                    try
+                    {
+                        config = Tuple.Create(address.Split(':')[0], int.Parse(address.Split(':')[1]));
+                    }
+                    catch 
+                    {
+                        config = Tuple.Create("127.0.0.1", 5000);
+                    }
+                }
+                else
+                {
+                    config = Tuple.Create("127.0.0.1", 5000);
+                }
+                var appKey = values.FirstOrDefault(n => n.Key == "appKey" && n.Enable)?.Value ?? "123456789";
+                request.AppKey = appKey;
             }
-
-            return request_.Request($"{url}?appKey={appKey}", request, callback);
+            if (!tcpRequest.Request(config, request, (LLMChatResponseInfo resp) =>
+            {
+                if (resp.Stop)
+                {
+                    response.Think += resp.Think;
+                    response.Answer += resp.Answer;
+                    response.Content += resp.Content;
+                    response.Message = resp.Message;
+                    response.Success = resp.Success;
+                    response.Stop = resp.Stop;
+                    response.ToolCalls = resp.ToolCalls;
+                    return true;
+                }
+                return callback.Invoke(resp);
+            }))
+            {
+                response.Stop = true;
+                response.Success = false;
+                response.Message = "未知异常!";
+            }
+            tcpRequest.Dispose();
+            return response;
         }
     }
 }

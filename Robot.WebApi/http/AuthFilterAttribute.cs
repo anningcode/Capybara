@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -15,8 +14,9 @@ namespace Robot.WebApi.http
     public class AuthFilterAttribute : ActionFilterAttribute
     {
         public AuthFilterAttribute() { }
-        public AuthFilterAttribute(int time)
+        public AuthFilterAttribute(int time, string cookieKey = "_SESSIONS_")
         {
+            HttpSession.cookieKey_ = cookieKey;
             SessionKeyManager.minute_ = time;
         }
         // 请求

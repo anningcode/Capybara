@@ -11,7 +11,8 @@ namespace Robot.WebApi.http
 {
     public class HttpSession
     {
-        private static SessionKeyManager sessionKeyManager_ = new();
+        public static string cookieKey_ { get; set; } = "_SESSIONS_";
+        private static SessionKeyManager sessionKeyManager_ { get; set; } = new();
         private long requestTime_ { get; set; } = 0;
         // 请求时间
         [JsonProperty]
@@ -87,7 +88,7 @@ namespace Robot.WebApi.http
             string json = JsonConvert.SerializeObject(session);
             string sessionValue = sessionKeyManager_.GetEncryptValue(json);
             context.HttpContext.Response.Headers.Add("_SESSIONS_", sessionValue);
-            context.HttpContext.Response.Cookies.Append("_SESSIONS_", sessionValue);
+            context.HttpContext.Response.Cookies.Append(cookieKey_, sessionValue);
         }
         public HttpSession() { }
         public HttpSession(ActionExecutingContext context)
@@ -130,9 +131,9 @@ namespace Robot.WebApi.http
                         json = context.Request.Query["_SESSIONS_"];
                         json = json?.Replace(' ', '+');
                     }
-                    else if (context.Request.Cookies.ContainsKey("_SESSIONS_"))
+                    else if (context.Request.Cookies.ContainsKey(cookieKey_))
                     {
-                        json = context.Request.Cookies["_SESSIONS_"];
+                        json = context.Request.Cookies[cookieKey_];
                     }
                     if (json == null) break;
                     (bool ok, string data) = sessionKeyManager_.GetDecryptValue(json);

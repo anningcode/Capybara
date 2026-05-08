@@ -62,4 +62,8 @@
     </None>
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="capybara\memory\context\" />
+  </ItemGroup>
+
 </Project>

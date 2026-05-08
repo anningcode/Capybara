@@ -57,6 +57,7 @@ namespace Capybara.Service
             if (result == null) return false;
             result.ToolName = value.ToolName;
             result.Confirm = value.Confirm;
+            result.Enable = value.Enable;
             result.Remarks = value.Remarks;
             AppConfig.Set("tools", values);
             return true;

@@ -34,14 +34,10 @@
                     </div>
                     <label class="layui-form-label">工具确认：</label>
                     <div class="layui-input-inline">
-                        <input name="confirm" value="true" title="启用" ${if name:`AgentChatToolInfo`, property:`Confirm`, value:`true`, ifval:`checked`} type="radio" />
-                        <div class="layui-unselect layui-form-radio layui-form-radioed">
-                            <i class="layui-anim layui-icon"></i><div>启用</div>
-                        </div>
-                        <input name="confirm" value="false" title="停用" ${if name:`AgentChatToolInfo`, property:`Confirm`, value:`false`, ifval:`checked`} type="radio" />
-                        <div class="layui-unselect layui-form-radio">
-                            <i class="layui-anim layui-icon"></i><div>停用</div>
-                        </div>
+                        <select name='confirm'>
+                            <option ${if name:`AgentChatToolInfo`, property:`Confirm`, value:`true`, ifval:`selected`} value='true'> 启用 </option>
+                            <option ${if name:`AgentChatToolInfo`, property:`Confirm`, value:`false`, ifval:`selected`} value='false'> 禁用 </option>
+                        </select>
                     </div>
                 </div>
                 <div class="layui-form-item">

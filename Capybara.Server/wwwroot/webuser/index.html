@@ -80,7 +80,11 @@
 					{ field: 'id', title: 'Id', width: 80, fixed: 'left' },
                     { field: 'name', title: '名称', width: 200 },
                     { field: 'code', title: '账号', width: 200 },
-                    { field: 'password', title: '密码', width: 200 },
+                    {
+                        field: 'password', title: '密码', width: 200, templet: function (res) {
+                            return '******';
+						}
+					},
 					{
 						field: 'enable', title: '启用', width: 80, templet: function (res) {
 							return res.enable ? '启用' : '禁用';

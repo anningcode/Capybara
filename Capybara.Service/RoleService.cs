@@ -73,6 +73,7 @@ namespace Capybara.Service
             result.Skills = value.Skills;
             result.Tools = value.Tools;
             result.Middles = value.Middles;
+            result.Enable = value.Enable;
             result.Remarks = value.Remarks;
             AppConfig.Set("roles", values);
             return true;

@@ -61,6 +61,7 @@ namespace Capybara.Service
             result.Sex = value.Sex;
             result.Height = value.Height;
             result.Weight = value.Weight;
+            result.Enable = value.Enable;
             result.Remarks = value.Remarks;
             AppConfig.Set("users", values);
             return true;

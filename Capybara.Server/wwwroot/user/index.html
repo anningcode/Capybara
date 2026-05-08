@@ -84,7 +84,7 @@
 				},
 				cols: [[ //表头
 					{ field: 'id', title: 'Id', width: 300, fixed: 'left' },
-                    { field: 'roleId', title: '角色ID', width: 200 },
+                    { field: 'roleId', title: '角色ID', width: 120 },
                     { field: 'name', title: '名称', width: 120 },
 					{ field: 'age', title: '年纪', width: 120 },
 					{ 
@@ -128,7 +128,7 @@
 					layer.open({
 						type: 2
 						, title: '编辑'
-                        , area: ['680px', '410px']
+                        , area: ['680px', '450px']
 						, maxmin: true
                         , content: '/user/editView?id=' + data.id
 					});
@@ -173,7 +173,7 @@
 					layer.open({
 						type: 2
 						, title: '添加'
-						, area: ['680px', '410px']
+                        , area: ['680px', '450px']
 						, maxmin: false
                         , content: '/user/addView'
 					});

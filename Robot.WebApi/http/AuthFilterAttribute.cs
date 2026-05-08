@@ -14,9 +14,8 @@ namespace Robot.WebApi.http
     public class AuthFilterAttribute : ActionFilterAttribute
     {
         public AuthFilterAttribute() { }
-        public AuthFilterAttribute(int time, string cookieKey = "_SESSIONS_")
+        public AuthFilterAttribute(int time)
         {
-            HttpSession.cookieKey_ = cookieKey;
             SessionKeyManager.minute_ = time;
         }
         // 请求

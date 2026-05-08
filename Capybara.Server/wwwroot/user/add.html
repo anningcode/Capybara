@@ -59,6 +59,19 @@
                     </div>
                 </div>
                 <div class="layui-form-item">
+                    <label class="layui-form-label">状态：</label>
+                    <div class="layui-input-inline">
+                        <input name="enable" value="true" title="启用" checked type="radio" />
+                        <div class="layui-unselect layui-form-radio layui-form-radioed">
+                            <i class="layui-anim layui-icon"></i><div>启用</div>
+                        </div>
+                        <input name="enable" value="false" title="停用" type="radio" />
+                        <div class="layui-unselect layui-form-radio">
+                            <i class="layui-anim layui-icon"></i><div>停用</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layui-form-item">
                     <label class="layui-form-label">备注：</label>
                     <div class="layui-input-block">
                         <textarea class="layui-textarea" cols="20" id="remarks" lay-verify="pass" lay-vertype="tips" name="remarks" rows="2" placeholder="请输入备注"></textarea>

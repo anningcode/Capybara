@@ -59,6 +59,7 @@ namespace Capybara.Service
             if (result == null) return false;
             result.SkillName = value.SkillName;
             result.Confirm = value.Confirm;
+            result.Enable = value.Enable;
             result.Remarks = value.Remarks;
             AppConfig.Set("skills", values);
             return true;

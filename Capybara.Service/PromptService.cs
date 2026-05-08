@@ -58,6 +58,7 @@ namespace Capybara.Service
             var result = values.FirstOrDefault(n => n.Id == value.Id);
             if (result == null) return false;
             result.PromptValue = value.PromptValue;
+            result.Enable = value.Enable;
             result.Remarks = value.Remarks;
             AppConfig.Set("prompts", values);
             return true;

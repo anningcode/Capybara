@@ -2,6 +2,7 @@ using Capybara.IService;
 using Capybara.Server.entrance;
 using Capybara.Service;
 using Microsoft.AspNetCore.Rewrite;
+using Robot.WebApi.http;
 
 class Program
 {
@@ -55,6 +56,8 @@ class Program
         app.UseWebSockets();
         app.MapControllers();
 
+        HttpSession.cookieKey_ = "_CAPYBARA_";
+        
         ChatEntrance chatEntrance = new ChatEntrance();
         chatEntrance.Init();
 

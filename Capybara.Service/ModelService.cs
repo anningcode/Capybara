@@ -59,6 +59,7 @@ namespace Capybara.Service
             if (result == null) return false;
             result.ModelName = value.ModelName;
             result.IsSubAgent = value.IsSubAgent;
+            result.Enable = value.Enable;
             result.Remarks = value.Remarks;
             AppConfig.Set("models", values);
             return true;

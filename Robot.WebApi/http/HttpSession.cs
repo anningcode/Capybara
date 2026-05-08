@@ -176,5 +176,15 @@ namespace Robot.WebApi.http
         {
             isAuth = value;
         }
+        public void SetWSId(string wsId)
+        {
+            sessions["_WEBSOCKETID_"] = wsId;
+        }
+        public string? GetWSId()
+        {
+            if (sessions.ContainsKey("_WEBSOCKETID_"))
+                return (string)sessions["_WEBSOCKETID_"];
+            return null;
+        }
     }
 }

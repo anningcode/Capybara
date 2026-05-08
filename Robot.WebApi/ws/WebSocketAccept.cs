@@ -12,6 +12,7 @@ namespace Robot.WebApi.ws
 {
     public abstract class WebSocketAccept
     {
+        protected HashSet<string> keys_ { get; set; } = new HashSet<string>();
         protected readonly WAutofacThreadHelper autofacThreadHelper_;
         protected readonly RequestDelegate next_;
         public WebSocketAccept(RequestDelegate next, WAutofacThreadHelper autofacThreadHelper)
@@ -41,7 +42,6 @@ namespace Robot.WebApi.ws
                 object? constructorValue = scope.ServiceProvider.GetService(parameters[0].ParameterType);
                 if (constructorValue == null) continue;
                 param.Add(constructorValue);
-                break;
             }
 
             return Activator.CreateInstance(type, param.ToArray());
@@ -64,9 +64,13 @@ namespace Robot.WebApi.ws
             if (session == null || !session.IsAuthorize()) return;
             WebSocket webSocket = await context.WebSockets.AcceptWebSocketAsync();
             string key = Guid.NewGuid().ToString();
+
             WebSocketSession value = new WebSocketSession();
             lock (WSessionManager.sessions)
             {
+                string? wskey = session.GetWSId();
+                if (string.IsNullOrEmpty(wskey) || keys_.Contains(wskey)) return;
+                keys_.Add(wskey);
                 WSessionManager.sessions.Add(key, value);
             }
             List<IWController> controllers = new List<IWController>();
@@ -75,6 +79,7 @@ namespace Robot.WebApi.ws
             await value.ReceiveLoop(webSocket, session, controllers);
             lock (WSessionManager.sessions)
             {
+                keys_.Remove(value.GetSession()?.GetWSId() ?? "");
                 WSessionManager.sessions.Remove(key);
             }
             value.Dispose();
@@ -101,6 +106,9 @@ namespace Robot.WebApi.ws
             WebSocketSession value = new WebSocketSession();
             lock (WSessionManager.sessions)
             {
+                string? wskey = session.GetWSId();
+                if (string.IsNullOrEmpty(wskey) || keys_.Contains(wskey)) return;
+                keys_.Add(wskey);
                 WSessionManager.sessions.Add(key, value);
             }
             List<IWController> controllers = new List<IWController>();
@@ -111,6 +119,7 @@ namespace Robot.WebApi.ws
             await value.ReceiveLoop(webSocket, session, controllers);
             lock (WSessionManager.sessions)
             {
+                keys_.Remove(value.GetSession()?.GetWSId() ?? "");
                 WSessionManager.sessions.Remove(key);
             }
             value.Dispose();
@@ -138,6 +147,9 @@ namespace Robot.WebApi.ws
             WebSocketSession value = new WebSocketSession();
             lock (WSessionManager.sessions)
             {
+                string? wskey = session.GetWSId();
+                if (string.IsNullOrEmpty(wskey) || keys_.Contains(wskey)) return;
+                keys_.Add(wskey);
                 WSessionManager.sessions.Add(key, value);
             }
             List<IWController> controllers = new List<IWController>();
@@ -150,6 +162,7 @@ namespace Robot.WebApi.ws
             await value.ReceiveLoop(webSocket, session, controllers);
             lock (WSessionManager.sessions)
             {
+                keys_.Remove(value.GetSession()?.GetWSId() ?? "");
                 WSessionManager.sessions.Remove(key);
             }
             value.Dispose();
@@ -178,6 +191,9 @@ namespace Robot.WebApi.ws
             WebSocketSession value = new WebSocketSession();
             lock (WSessionManager.sessions)
             {
+                string? wskey = session.GetWSId();
+                if (string.IsNullOrEmpty(wskey) || keys_.Contains(wskey)) return;
+                keys_.Add(wskey);
                 WSessionManager.sessions.Add(key, value);
             }
             List<IWController> controllers = new List<IWController>();
@@ -192,6 +208,7 @@ namespace Robot.WebApi.ws
             await value.ReceiveLoop(webSocket, session, controllers);
             lock (WSessionManager.sessions)
             {
+                keys_.Remove(value.GetSession()?.GetWSId() ?? "");
                 WSessionManager.sessions.Remove(key);
             }
             value.Dispose();
@@ -221,6 +238,9 @@ namespace Robot.WebApi.ws
             WebSocketSession value = new WebSocketSession();
             lock (WSessionManager.sessions)
             {
+                string? wskey = session.GetWSId();
+                if (string.IsNullOrEmpty(wskey) || keys_.Contains(wskey)) return;
+                keys_.Add(wskey);
                 WSessionManager.sessions.Add(key, value);
             }
             List<IWController> controllers = new List<IWController>();
@@ -237,6 +257,7 @@ namespace Robot.WebApi.ws
             await value.ReceiveLoop(webSocket, session, controllers);
             lock (WSessionManager.sessions)
             {
+                keys_.Remove(value.GetSession()?.GetWSId() ?? "");
                 WSessionManager.sessions.Remove(key);
             }
             value.Dispose();
@@ -267,6 +288,9 @@ namespace Robot.WebApi.ws
             WebSocketSession value = new WebSocketSession();
             lock (WSessionManager.sessions)
             {
+                string? wskey = session.GetWSId();
+                if (string.IsNullOrEmpty(wskey) || keys_.Contains(wskey)) return;
+                keys_.Add(wskey);
                 WSessionManager.sessions.Add(key, value);
             }
             List<IWController> controllers = new List<IWController>();
@@ -285,6 +309,7 @@ namespace Robot.WebApi.ws
             await value.ReceiveLoop(webSocket, session, controllers);
             lock (WSessionManager.sessions)
             {
+                keys_.Remove(value.GetSession()?.GetWSId() ?? "");
                 WSessionManager.sessions.Remove(key);
             }
             value.Dispose();
@@ -316,6 +341,9 @@ namespace Robot.WebApi.ws
             WebSocketSession value = new WebSocketSession();
             lock (WSessionManager.sessions)
             {
+                string? wskey = session.GetWSId();
+                if (string.IsNullOrEmpty(wskey) || keys_.Contains(wskey)) return;
+                keys_.Add(wskey);
                 WSessionManager.sessions.Add(key, value);
             }
             List<IWController> controllers = new List<IWController>();
@@ -336,6 +364,7 @@ namespace Robot.WebApi.ws
             await value.ReceiveLoop(webSocket, session, controllers);
             lock (WSessionManager.sessions)
             {
+                keys_.Remove(value.GetSession()?.GetWSId() ?? "");
                 WSessionManager.sessions.Remove(key);
             }
             value.Dispose();
@@ -368,6 +397,9 @@ namespace Robot.WebApi.ws
             WebSocketSession value = new WebSocketSession();
             lock (WSessionManager.sessions)
             {
+                string? wskey = session.GetWSId();
+                if (string.IsNullOrEmpty(wskey) || keys_.Contains(wskey)) return;
+                keys_.Add(wskey);
                 WSessionManager.sessions.Add(key, value);
             }
             List<IWController> controllers = new List<IWController>();
@@ -390,6 +422,7 @@ namespace Robot.WebApi.ws
             await value.ReceiveLoop(webSocket, session, controllers);
             lock (WSessionManager.sessions)
             {
+                keys_.Remove(value.GetSession()?.GetWSId() ?? "");
                 WSessionManager.sessions.Remove(key);
             }
             value.Dispose();
@@ -423,6 +456,9 @@ namespace Robot.WebApi.ws
             WebSocketSession value = new WebSocketSession();
             lock (WSessionManager.sessions)
             {
+                string? wskey = session.GetWSId();
+                if (string.IsNullOrEmpty(wskey) || keys_.Contains(wskey)) return;
+                keys_.Add(wskey);
                 WSessionManager.sessions.Add(key, value);
             }
             List<IWController> controllers = new List<IWController>();
@@ -447,6 +483,7 @@ namespace Robot.WebApi.ws
             await value.ReceiveLoop(webSocket, session, controllers);
             lock (WSessionManager.sessions)
             {
+                keys_.Remove(value.GetSession()?.GetWSId() ?? "");
                 WSessionManager.sessions.Remove(key);
             }
             value.Dispose();
@@ -481,6 +518,9 @@ namespace Robot.WebApi.ws
             WebSocketSession value = new WebSocketSession();
             lock (WSessionManager.sessions)
             {
+                string? wskey = session.GetWSId();
+                if (string.IsNullOrEmpty(wskey) || keys_.Contains(wskey)) return;
+                keys_.Add(wskey);
                 WSessionManager.sessions.Add(key, value);
             }
             List<IWController> controllers = new List<IWController>();
@@ -507,6 +547,7 @@ namespace Robot.WebApi.ws
             await value.ReceiveLoop(webSocket, session, controllers);
             lock (WSessionManager.sessions)
             {
+                keys_.Remove(value.GetSession()?.GetWSId() ?? "");
                 WSessionManager.sessions.Remove(key);
             }
             value.Dispose();

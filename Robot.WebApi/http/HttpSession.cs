@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.DataProtection.KeyManagement;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Newtonsoft.Json;
 using System;
@@ -176,9 +177,9 @@ namespace Robot.WebApi.http
         {
             isAuth = value;
         }
-        public void SetWSId(string wsId)
+        public void SetWSId(string wsid)
         {
-            sessions["_WEBSOCKETID_"] = wsId;
+            sessions["_WEBSOCKETID_"] = wsid;
         }
         public string? GetWSId()
         {

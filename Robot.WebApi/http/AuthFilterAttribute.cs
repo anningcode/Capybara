@@ -1,11 +1,14 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Newtonsoft.Json;
 using Robot.WebApi.models;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -13,9 +16,13 @@ namespace Robot.WebApi.http
 {
     public class AuthFilterAttribute : ActionFilterAttribute
     {
+        private string? defautlPage_ { get; set; } = null;
+        private string? homePage_ { get; set; } = null; 
         public AuthFilterAttribute() { }
-        public AuthFilterAttribute(int time)
+        public AuthFilterAttribute(int time, string? defautlPage = null, string? homePage = null)
         {
+            defautlPage_ = defautlPage;
+            homePage_ = homePage;
             SessionKeyManager.minute_ = time;
         }
         // 请求
@@ -31,28 +38,42 @@ namespace Robot.WebApi.http
 
             // 授权后不能访问
             var hasNo = context.ActionDescriptor.FilterDescriptors
-            .Any(fd => fd.Filter is AuthReverseAttribute);
+                .Any(fd => fd.Filter is AuthReverseAttribute);
 
             if (hasNo)
             {
                 if (session.IsAuthorize())
                 {
-                    context.Result = new ContentResult()
+                    if (homePage_ != null)
                     {
-                        Content = JsonConvert.SerializeObject(new HResult { code = 101, message = "已经授权不能访问!" }),
-                        ContentType = "application/json",
-                        StatusCode = (int)HttpStatusCode.Forbidden
-                    };
+                        context.Result = new RedirectResult(homePage_);
+                    }
+                    else
+                    {
+                        context.Result = new ContentResult()
+                        {
+                            Content = JsonConvert.SerializeObject(new HResult { code = 101, message = "已经授权不能访问!" }),
+                            ContentType = "application/json",
+                            StatusCode = (int)HttpStatusCode.Forbidden
+                        };
+                    }
                 }
             }
             else if (!session.IsAuthorize())
             {
-                context.Result = new ContentResult()
+                if (defautlPage_ != null)
                 {
-                    Content = JsonConvert.SerializeObject(new HResult { code = 100, message = "未授权!" }),
-                    ContentType = "application/json",
-                    StatusCode = (int)HttpStatusCode.Forbidden
-                };
+                    context.Result = new RedirectResult(defautlPage_);
+                }
+                else
+                {
+                    context.Result = new ContentResult()
+                    {
+                        Content = JsonConvert.SerializeObject(new HResult { code = 100, message = "未授权!" }),
+                        ContentType = "application/json",
+                        StatusCode = (int)HttpStatusCode.Forbidden
+                    };
+                }
             }
             base.OnActionExecuting(context);
         }

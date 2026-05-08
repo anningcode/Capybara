@@ -6,7 +6,7 @@ namespace Capybara.Server.Controllers
 {
     [ApiController]
     [Route("home")]
-    [AuthFilter(60)]
+    [AuthFilter(60, "/account/index", "/home/index")]
     public class HomeController : HController
     {
         [HttpGet("index")]

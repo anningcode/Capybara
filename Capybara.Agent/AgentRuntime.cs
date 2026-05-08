@@ -24,7 +24,6 @@ namespace Capybara.Agent
             onResponse = callback;
         }
         // 请求
-        // 请求
         public void Request(AgentChatMessageInfo request)
         {
 
@@ -78,6 +77,7 @@ namespace Capybara.Agent
             {
                 if (!session.CreateSession(request.UserId))
                 {
+                    Response(request, AgentChatErrorResponseInfo.Type, new AgentChatErrorResponseInfo { Message = "用户不存在!" });
                     return;
                 }
             }
@@ -91,7 +91,7 @@ namespace Capybara.Agent
             AgentChatSession session = new AgentChatSession(request);
             if (!session.LoadSession())
             {
-                // 异常session不存在
+                Response(request, AgentChatErrorResponseInfo.Type, new AgentChatErrorResponseInfo { Message = "异常session不存在!" });
                 return;
             }
             Request(session);
@@ -102,7 +102,7 @@ namespace Capybara.Agent
             AgentChatSession session = new AgentChatSession(request);
             if (!session.LoadSession())
             {
-                // 异常session不存在
+                Response(request, AgentChatErrorResponseInfo.Type, new AgentChatErrorResponseInfo { Message = "异常session不存在!" });
                 return;
             }
             Request(session);
@@ -113,7 +113,7 @@ namespace Capybara.Agent
             AgentChatSession session = new AgentChatSession(request);
             if (!session.LoadSession())
             {
-                // 异常 session不存在
+                Response(request, AgentChatErrorResponseInfo.Type, new AgentChatErrorResponseInfo { Message = "异常session不存在!" });
                 return;
             }
             Request(session);

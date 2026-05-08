@@ -9,7 +9,7 @@ namespace Capybara.Server.Controllers
 {
     [ApiController]
     [Route("skill")]
-    [AuthFilter(60)]
+    [AuthFilter(60, "/account/index", "/home/index")]
     public class SkillController : HController
     {
         private ISkillService skill_ { get; set; }

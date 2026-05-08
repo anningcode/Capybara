@@ -9,7 +9,7 @@ namespace Capybara.Server.Controllers
 {
     [ApiController]
     [Route("model")]
-    [AuthFilter(60)]
+    [AuthFilter(60, "/account/index", "/home/index")]
     public class ModelController : HController
     {
         private IModelService model_ { get; set; }

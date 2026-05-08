@@ -9,7 +9,7 @@ namespace Capybara.Server.Controllers
 {
     [ApiController]
     [Route("user")]
-    [AuthFilter(60)]
+    [AuthFilter(60, "/account/index", "/home/index")]
     public class UserController : HController
     {
         private IUserService user_ { get; set; }

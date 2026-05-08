@@ -9,7 +9,7 @@ namespace Capybara.Server.Controllers
 {
     [ApiController]
     [Route("general")]
-    [AuthFilter(60)]
+    [AuthFilter(60, "/account/index", "/home/index")]
     public class GeneralController : HController
     {
         private IGeneralService general_ { get; set; }

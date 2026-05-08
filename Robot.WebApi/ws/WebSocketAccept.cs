@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 using Robot.WebApi.http;
 using System;
 using System.Collections.Generic;
@@ -27,9 +28,9 @@ namespace Robot.WebApi.ws
                 await next_.Invoke(context); return;
             }
         }
-        protected object? CreateInstance<T>() where T : class, new()
+        protected Tuple<IWController, IServiceScope>? CreateInstance<T>() where T : class, IWController, new()
         {
-            using var scope = autofacThreadHelper_.BeginNewScope();
+            var scope = autofacThreadHelper_.BeginNewScope();
 
             Type type = typeof(T);
             List<object> param = new List<object>();
@@ -37,14 +38,18 @@ namespace Robot.WebApi.ws
             foreach (var ctor in constructors)
             {
                 ParameterInfo[] parameters = ctor.GetParameters();
-                if (parameters.Length != 1) continue;
-                
-                object? constructorValue = scope.ServiceProvider.GetService(parameters[0].ParameterType);
-                if (constructorValue == null) continue;
-                param.Add(constructorValue);
+                foreach (var parameter in ctor.GetParameters())
+                {
+                    object? constructorValue = scope.ServiceProvider.GetService(parameter.ParameterType);
+                    if (constructorValue == null) continue;
+                    param.Add(constructorValue);
+                }
             }
 
-            return Activator.CreateInstance(type, param.ToArray());
+            var obj = Activator.CreateInstance(type, param.ToArray());
+            if (obj == null) return null;
+
+            return Tuple.Create((IWController)(T)obj, scope);
         }
     }
     public class WebSocketAccept<T1> :
@@ -73,14 +78,18 @@ namespace Robot.WebApi.ws
                 keys_.Add(wskey);
                 WSessionManager.sessions.Add(key, value);
             }
-            List<IWController> controllers = new List<IWController>();
-            object? t1 = CreateInstance<T1>();
-            if (t1 != null) controllers.Add((T1)t1);
+            List<Tuple<IWController, IServiceScope>> controllers = new();
+            var t1 = CreateInstance<T1>();
+            if (t1 != null) controllers.Add(t1);
             await value.ReceiveLoop(webSocket, session, controllers);
             lock (WSessionManager.sessions)
             {
                 keys_.Remove(value.GetSession()?.GetWSId() ?? "");
                 WSessionManager.sessions.Remove(key);
+                foreach (var controller in controllers)
+                {
+                    controller.Item2.Dispose();
+                }
             }
             value.Dispose();
         }
@@ -111,11 +120,11 @@ namespace Robot.WebApi.ws
                 keys_.Add(wskey);
                 WSessionManager.sessions.Add(key, value);
             }
-            List<IWController> controllers = new List<IWController>();
-            object? t1 = CreateInstance<T1>();
-            if (t1 != null) controllers.Add((T1)t1);
-            object? t2 = CreateInstance<T2>();
-            if (t2 != null) controllers.Add((T2)t2);
+            List<Tuple<IWController, IServiceScope>> controllers = new();
+            var t1 = CreateInstance<T1>();
+            if (t1 != null) controllers.Add(t1);
+            var t2 = CreateInstance<T2>();
+            if (t2 != null) controllers.Add(t2);
             await value.ReceiveLoop(webSocket, session, controllers);
             lock (WSessionManager.sessions)
             {
@@ -152,13 +161,13 @@ namespace Robot.WebApi.ws
                 keys_.Add(wskey);
                 WSessionManager.sessions.Add(key, value);
             }
-            List<IWController> controllers = new List<IWController>();
-            object? t1 = CreateInstance<T1>();
-            if (t1 != null) controllers.Add((T1)t1);
-            object? t2 = CreateInstance<T2>();
-            if (t2 != null) controllers.Add((T2)t2);
-            object? t3 = CreateInstance<T3>();
-            if (t3 != null) controllers.Add((T3)t3);
+            List<Tuple<IWController, IServiceScope>> controllers = new();
+            var t1 = CreateInstance<T1>();
+            if (t1 != null) controllers.Add(t1);
+            var t2 = CreateInstance<T2>();
+            if (t2 != null) controllers.Add(t2);
+            var t3 = CreateInstance<T3>();
+            if (t3 != null) controllers.Add(t3);
             await value.ReceiveLoop(webSocket, session, controllers);
             lock (WSessionManager.sessions)
             {
@@ -196,15 +205,15 @@ namespace Robot.WebApi.ws
                 keys_.Add(wskey);
                 WSessionManager.sessions.Add(key, value);
             }
-            List<IWController> controllers = new List<IWController>();
-            object? t1 = CreateInstance<T1>();
-            if (t1 != null) controllers.Add((T1)t1);
-            object? t2 = CreateInstance<T2>();
-            if (t2 != null) controllers.Add((T2)t2);
-            object? t3 = CreateInstance<T3>();
-            if (t3 != null) controllers.Add((T3)t3);
-            object? t4 = CreateInstance<T4>();
-            if (t4 != null) controllers.Add((T4)t4);
+            List<Tuple<IWController, IServiceScope>> controllers = new();
+            var t1 = CreateInstance<T1>();
+            if (t1 != null) controllers.Add(t1);
+            var t2 = CreateInstance<T2>();
+            if (t2 != null) controllers.Add(t2);
+            var t3 = CreateInstance<T3>();
+            if (t3 != null) controllers.Add(t3);
+            var t4 = CreateInstance<T4>();
+            if (t4 != null) controllers.Add(t4);
             await value.ReceiveLoop(webSocket, session, controllers);
             lock (WSessionManager.sessions)
             {
@@ -243,17 +252,17 @@ namespace Robot.WebApi.ws
                 keys_.Add(wskey);
                 WSessionManager.sessions.Add(key, value);
             }
-            List<IWController> controllers = new List<IWController>();
-            object? t1 = CreateInstance<T1>();
-            if (t1 != null) controllers.Add((T1)t1);
-            object? t2 = CreateInstance<T2>();
-            if (t2 != null) controllers.Add((T2)t2);
-            object? t3 = CreateInstance<T3>();
-            if (t3 != null) controllers.Add((T3)t3);
-            object? t4 = CreateInstance<T4>();
-            if (t4 != null) controllers.Add((T4)t4);
-            object? t5 = CreateInstance<T5>();
-            if (t5 != null) controllers.Add((T5)t5);
+            List<Tuple<IWController, IServiceScope>> controllers = new();
+            var t1 = CreateInstance<T1>();
+            if (t1 != null) controllers.Add(t1);
+            var t2 = CreateInstance<T2>();
+            if (t2 != null) controllers.Add(t2);
+            var t3 = CreateInstance<T3>();
+            if (t3 != null) controllers.Add(t3);
+            var t4 = CreateInstance<T4>();
+            if (t4 != null) controllers.Add(t4);
+            var t5 = CreateInstance<T5>();
+            if (t5 != null) controllers.Add(t5);
             await value.ReceiveLoop(webSocket, session, controllers);
             lock (WSessionManager.sessions)
             {
@@ -293,19 +302,19 @@ namespace Robot.WebApi.ws
                 keys_.Add(wskey);
                 WSessionManager.sessions.Add(key, value);
             }
-            List<IWController> controllers = new List<IWController>();
-            object? t1 = CreateInstance<T1>();
-            if (t1 != null) controllers.Add((T1)t1);
-            object? t2 = CreateInstance<T2>();
-            if (t2 != null) controllers.Add((T2)t2);
-            object? t3 = CreateInstance<T3>();
-            if (t3 != null) controllers.Add((T3)t3);
-            object? t4 = CreateInstance<T4>();
-            if (t4 != null) controllers.Add((T4)t4);
-            object? t5 = CreateInstance<T5>();
-            if (t5 != null) controllers.Add((T5)t5);
-            object? t6 = CreateInstance<T6>();
-            if (t6 != null) controllers.Add((T6)t6);
+            List<Tuple<IWController, IServiceScope>> controllers = new();
+            var t1 = CreateInstance<T1>();
+            if (t1 != null) controllers.Add(t1);
+            var t2 = CreateInstance<T2>();
+            if (t2 != null) controllers.Add(t2);
+            var t3 = CreateInstance<T3>();
+            if (t3 != null) controllers.Add(t3);
+            var t4 = CreateInstance<T4>();
+            if (t4 != null) controllers.Add(t4);
+            var t5 = CreateInstance<T5>();
+            if (t5 != null) controllers.Add(t5);
+            var t6 = CreateInstance<T6>();
+            if (t6 != null) controllers.Add(t6);
             await value.ReceiveLoop(webSocket, session, controllers);
             lock (WSessionManager.sessions)
             {
@@ -346,21 +355,21 @@ namespace Robot.WebApi.ws
                 keys_.Add(wskey);
                 WSessionManager.sessions.Add(key, value);
             }
-            List<IWController> controllers = new List<IWController>();
-            object? t1 = CreateInstance<T1>();
-            if (t1 != null) controllers.Add((T1)t1);
-            object? t2 = CreateInstance<T2>();
-            if (t2 != null) controllers.Add((T2)t2);
-            object? t3 = CreateInstance<T3>();
-            if (t3 != null) controllers.Add((T3)t3);
-            object? t4 = CreateInstance<T4>();
-            if (t4 != null) controllers.Add((T4)t4);
-            object? t5 = CreateInstance<T5>();
-            if (t5 != null) controllers.Add((T5)t5);
-            object? t6 = CreateInstance<T6>();
-            if (t6 != null) controllers.Add((T6)t6);
-            object? t7 = CreateInstance<T7>();
-            if (t7 != null) controllers.Add((T7)t7);
+            List<Tuple<IWController, IServiceScope>> controllers = new();
+            var t1 = CreateInstance<T1>();
+            if (t1 != null) controllers.Add(t1);
+            var t2 = CreateInstance<T2>();
+            if (t2 != null) controllers.Add(t2);
+            var t3 = CreateInstance<T3>();
+            if (t3 != null) controllers.Add(t3);
+            var t4 = CreateInstance<T4>();
+            if (t4 != null) controllers.Add(t4);
+            var t5 = CreateInstance<T5>();
+            if (t5 != null) controllers.Add(t5);
+            var t6 = CreateInstance<T6>();
+            if (t6 != null) controllers.Add(t6);
+            var t7 = CreateInstance<T7>();
+            if (t7 != null) controllers.Add(t7);
             await value.ReceiveLoop(webSocket, session, controllers);
             lock (WSessionManager.sessions)
             {
@@ -402,23 +411,23 @@ namespace Robot.WebApi.ws
                 keys_.Add(wskey);
                 WSessionManager.sessions.Add(key, value);
             }
-            List<IWController> controllers = new List<IWController>();
-            object? t1 = CreateInstance<T1>();
-            if (t1 != null) controllers.Add((T1)t1);
-            object? t2 = CreateInstance<T2>();
-            if (t2 != null) controllers.Add((T2)t2);
-            object? t3 = CreateInstance<T3>();
-            if (t3 != null) controllers.Add((T3)t3);
-            object? t4 = CreateInstance<T4>();
-            if (t4 != null) controllers.Add((T4)t4);
-            object? t5 = CreateInstance<T5>();
-            if (t5 != null) controllers.Add((T5)t5);
-            object? t6 = CreateInstance<T6>();
-            if (t6 != null) controllers.Add((T6)t6);
-            object? t7 = CreateInstance<T7>();
-            if (t7 != null) controllers.Add((T7)t7);
-            object? t8 = CreateInstance<T8>();
-            if (t8 != null) controllers.Add((T8)t8);
+            List<Tuple<IWController, IServiceScope>> controllers = new();
+            var t1 = CreateInstance<T1>();
+            if (t1 != null) controllers.Add(t1);
+            var t2 = CreateInstance<T2>();
+            if (t2 != null) controllers.Add(t2);
+            var t3 = CreateInstance<T3>();
+            if (t3 != null) controllers.Add(t3);
+            var t4 = CreateInstance<T4>();
+            if (t4 != null) controllers.Add(t4);
+            var t5 = CreateInstance<T5>();
+            if (t5 != null) controllers.Add(t5);
+            var t6 = CreateInstance<T6>();
+            if (t6 != null) controllers.Add(t6);
+            var t7 = CreateInstance<T7>();
+            if (t7 != null) controllers.Add(t7);
+            var t8 = CreateInstance<T8>();
+            if (t8 != null) controllers.Add(t8);
             await value.ReceiveLoop(webSocket, session, controllers);
             lock (WSessionManager.sessions)
             {
@@ -461,25 +470,25 @@ namespace Robot.WebApi.ws
                 keys_.Add(wskey);
                 WSessionManager.sessions.Add(key, value);
             }
-            List<IWController> controllers = new List<IWController>();
-            object? t1 = CreateInstance<T1>();
-            if (t1 != null) controllers.Add((T1)t1);
-            object? t2 = CreateInstance<T2>();
-            if (t2 != null) controllers.Add((T2)t2);
-            object? t3 = CreateInstance<T3>();
-            if (t3 != null) controllers.Add((T3)t3);
-            object? t4 = CreateInstance<T4>();
-            if (t4 != null) controllers.Add((T4)t4);
-            object? t5 = CreateInstance<T5>();
-            if (t5 != null) controllers.Add((T5)t5);
-            object? t6 = CreateInstance<T6>();
-            if (t6 != null) controllers.Add((T6)t6);
-            object? t7 = CreateInstance<T7>();
-            if (t7 != null) controllers.Add((T7)t7);
-            object? t8 = CreateInstance<T8>();
-            if (t8 != null) controllers.Add((T8)t8);
-            object? t9 = CreateInstance<T9>();
-            if (t9 != null) controllers.Add((T9)t9);
+            List<Tuple<IWController, IServiceScope>> controllers = new();
+            var t1 = CreateInstance<T1>();
+            if (t1 != null) controllers.Add(t1);
+            var t2 = CreateInstance<T2>();
+            if (t2 != null) controllers.Add(t2);
+            var t3 = CreateInstance<T3>();
+            if (t3 != null) controllers.Add(t3);
+            var t4 = CreateInstance<T4>();
+            if (t4 != null) controllers.Add(t4);
+            var t5 = CreateInstance<T5>();
+            if (t5 != null) controllers.Add(t5);
+            var t6 = CreateInstance<T6>();
+            if (t6 != null) controllers.Add(t6);
+            var t7 = CreateInstance<T7>();
+            if (t7 != null) controllers.Add(t7);
+            var t8 = CreateInstance<T8>();
+            if (t8 != null) controllers.Add(t8);
+            var t9 = CreateInstance<T9>();
+            if (t9 != null) controllers.Add(t9);
             await value.ReceiveLoop(webSocket, session, controllers);
             lock (WSessionManager.sessions)
             {
@@ -523,27 +532,27 @@ namespace Robot.WebApi.ws
                 keys_.Add(wskey);
                 WSessionManager.sessions.Add(key, value);
             }
-            List<IWController> controllers = new List<IWController>();
-            object? t1 = CreateInstance<T1>();
-            if (t1 != null) controllers.Add((T1)t1);
-            object? t2 = CreateInstance<T2>();
-            if (t2 != null) controllers.Add((T2)t2);
-            object? t3 = CreateInstance<T3>();
-            if (t3 != null) controllers.Add((T3)t3);
-            object? t4 = CreateInstance<T4>();
-            if (t4 != null) controllers.Add((T4)t4);
-            object? t5 = CreateInstance<T5>();
-            if (t5 != null) controllers.Add((T5)t5);
-            object? t6 = CreateInstance<T6>();
-            if (t6 != null) controllers.Add((T6)t6);
-            object? t7 = CreateInstance<T7>();
-            if (t7 != null) controllers.Add((T7)t7);
-            object? t8 = CreateInstance<T8>();
-            if (t8 != null) controllers.Add((T8)t8);
-            object? t9 = CreateInstance<T9>();
-            if (t9 != null) controllers.Add((T9)t9);
-            object? t10 = CreateInstance<T10>();
-            if (t10 != null) controllers.Add((T10)t10);
+            List<Tuple<IWController, IServiceScope>> controllers = new();
+            var t1 = CreateInstance<T1>();
+            if (t1 != null) controllers.Add(t1);
+            var t2 = CreateInstance<T2>();
+            if (t2 != null) controllers.Add(t2);
+            var t3 = CreateInstance<T3>();
+            if (t3 != null) controllers.Add(t3);
+            var t4 = CreateInstance<T4>();
+            if (t4 != null) controllers.Add(t4);
+            var t5 = CreateInstance<T5>();
+            if (t5 != null) controllers.Add(t5);
+            var t6 = CreateInstance<T6>();
+            if (t6 != null) controllers.Add(t6);
+            var t7 = CreateInstance<T7>();
+            if (t7 != null) controllers.Add(t7);
+            var t8 = CreateInstance<T8>();
+            if (t8 != null) controllers.Add(t8);
+            var t9 = CreateInstance<T9>();
+            if (t9 != null) controllers.Add(t9);
+            var t10 = CreateInstance<T10>();
+            if (t10 != null) controllers.Add(t10);
             await value.ReceiveLoop(webSocket, session, controllers);
             lock (WSessionManager.sessions)
             {

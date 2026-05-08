@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
 using Robot.WebApi.http;
 using Robot.WebApi.models;
 using System;
@@ -12,6 +13,7 @@ namespace Robot.WebApi.ws
 {
     public abstract class WController : IWController
     {
+        private IServiceScope? scope_ { get; set; } = null;
         private WebSocket? webSocketSession_ { get; set; }
         private HttpSession? httpSession_ { get; set; }
         public bool Send(string msg)
@@ -44,6 +46,16 @@ namespace Robot.WebApi.ws
         public void SetWebSocketSession(WebSocket? session)
         {
             webSocketSession_ = session;
+        }
+        public void SetServiceScope(IServiceScope? scope)
+        {
+            scope_ = scope;
+        }
+
+        public void Dispose()
+        {
+            if(scope_!=null)
+                scope_.Dispose();
         }
     }
 }

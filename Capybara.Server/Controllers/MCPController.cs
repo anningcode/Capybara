@@ -8,7 +8,7 @@ namespace Capybara.Server.Controllers
 {
     [ApiController]
     [Route("mcp")]
-    [AuthFilter(60)]
+    [AuthFilter(60, "/account/index", "/home/index")]
     public class MCPController : HController
     {
         private IMCPService mcp_ { get; set; }

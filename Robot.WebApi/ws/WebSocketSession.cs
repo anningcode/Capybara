@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Robot.WebApi.http;
 using Robot.WebApi.models;
@@ -15,7 +16,7 @@ namespace Robot.WebApi.ws
 {
     public class WebSocketSession : IDisposable
     {
-        private List<IWController> sessions_ { get; set; } = new();
+        private List<Tuple<IWController, IServiceScope>> sessions_ { get; set; } = new();
         private WebSocket? webSocketSession_ { get; set; }
         private HttpSession? httpSession_ { get; set; }
         public bool Send(string data)
@@ -41,7 +42,7 @@ namespace Robot.WebApi.ws
         {
             return httpSession_;
         }
-        public async Task ReceiveLoop(WebSocket webSocketSession, HttpSession httpSession, List<IWController> sessions)
+        public async Task ReceiveLoop(WebSocket webSocketSession, HttpSession httpSession, List<Tuple<IWController, IServiceScope>> sessions)
         {
             try
             {
@@ -50,8 +51,8 @@ namespace Robot.WebApi.ws
                 sessions_.AddRange(sessions);
                 foreach (var item in sessions_)
                 {
-                    item.SetHttpSession(httpSession);
-                    item.SetWebSocketSession(webSocketSession_);
+                    item.Item1.SetHttpSession(httpSession);
+                    item.Item1.SetWebSocketSession(webSocketSession_);
                 }
 
                 if (webSocketSession_ == null) return;
@@ -121,7 +122,7 @@ namespace Robot.WebApi.ws
             {
                 foreach (var obj in sessions_)
                 {
-                    var methods = obj.GetType().GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).Where(m => m.GetCustomAttribute<WRouteAttribute>() != null); ;
+                    var methods = obj.Item1.GetType().GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).Where(m => m.GetCustomAttribute<WRouteAttribute>() != null); ;
                     foreach (var method in methods)
                     {
                         var attr = method.GetCustomAttribute<WRouteAttribute>();
@@ -158,7 +159,7 @@ namespace Robot.WebApi.ws
                                 methodParameters.Add(JsonConvert.DeserializeObject(result.Item2[parameter.Name ?? "-"], parameter.ParameterType) ?? new object());
                             }
                         }
-                        object? v = method.Invoke(obj, methodParameters.ToArray());
+                        object? v = method.Invoke(obj.Item1, methodParameters.ToArray());
                         if (v == null) return true;
                         if (v.GetType() == typeof(int))
                         {

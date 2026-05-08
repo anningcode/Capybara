@@ -11,7 +11,7 @@ namespace Capybara.Server.Controllers
 {
     [ApiController]
     [Route("account")]
-    [AuthFilter(60)]
+    [AuthFilter(60, "/account/index", "/home/index")]
     public class AccountController : HController
     {
         private IAccoutService account_ { get; set; }

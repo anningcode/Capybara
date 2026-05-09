@@ -20,6 +20,7 @@ namespace Capybara.NexusNetEntrance
         {
             try
             {
+                Logger.Debug(JsonConvert.SerializeObject(response));
                 lock (tcpClientList_)
                 {
                     if (!tcpClientList_.ContainsKey(response.SessionId)) return false;
@@ -53,6 +54,7 @@ namespace Capybara.NexusNetEntrance
         {
             try
             {
+                Logger.Debug(json);
                 var chat = JsonConvert.DeserializeObject<AgentChatMessageInfo>(json);
                 if (chat == null) return;
                 ConnectTcpServer(chat.Address, chat.SessionId).Wait();
